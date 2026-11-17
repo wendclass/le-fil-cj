@@ -12,7 +12,9 @@ export async function POST(request: Request) {
   }
 
   const body = await request.json();
-  const { endpoint, keys } = body;
+  const sub = body.subscription || body;
+  const endpoint = sub.endpoint;
+  const keys = sub.keys;
 
   if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
     return NextResponse.json({ error: "Données de souscription invalides" }, { status: 400 });
@@ -46,7 +48,7 @@ export async function DELETE(request: Request) {
   }
 
   const body = await request.json();
-  const { endpoint } = body;
+  const endpoint = body.endpoint || body.subscription?.endpoint;
 
   if (!endpoint) {
     return NextResponse.json({ error: "Endpoint manquant" }, { status: 400 });

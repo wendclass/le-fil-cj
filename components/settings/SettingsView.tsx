@@ -140,7 +140,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ profile }) => {
         });
 
         if (!res.ok) {
-          showToast("Erreur lors de l’enregistrement de l’abonnement.", "error");
+          const errData = await res.json().catch(() => null);
+          showToast(errData?.error || "Erreur lors de l’enregistrement de l’abonnement.", "error");
           setIsLoading(false);
           return;
         }
