@@ -1,0 +1,104 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Sora:wght@600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Couleurs (tirées du logo : bleu marine du C, rouge du J) */
+  --color-bg: #FBF7EF;               /* crème, fond de page */
+  --color-surface: #FFFFFF;          /* cartes, champs, zones de lecture */
+  --color-surface-muted: #F4EFE4;    /* zones secondaires */
+  --color-border: #E7E1D3;
+  --color-text: #101437;
+  --color-text-muted: #5A5F7D;
+  --color-primary: #232D6B;          /* bleu marine : structure, boutons principaux */
+  --color-primary-hover: #1A2255;
+  --color-on-primary: #FFFFFF;
+  --color-alert: #E3141A;            /* rouge : retards, urgences, alertes */
+  --color-on-alert: #FFFFFF;
+  --color-accent: #D99A1E;           /* ocre : touche panafricaine, avertissements doux */
+  --color-on-accent: #232D6B;        /* l'ocre ne porte jamais de texte blanc */
+  --color-success: #187A4C;
+  --color-on-success: #FFFFFF;
+
+  /* Typographie avec polices de secours déclarées */
+  --font-display: "Sora", "Inter", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+
+  /* Espacements (base 4 px) */
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-8: 32px; --space-12: 48px;
+
+  /* Formes : arrondi généreux */
+  --radius-sm: 12px; --radius-md: 20px; --radius-lg: 28px; --radius-pill: 999px;
+
+  /* Ombres douces teintées de bleu marine */
+  --shadow-1: 0 1px 2px rgba(35,45,107,.06), 0 2px 8px rgba(35,45,107,.05);
+  --shadow-2: 0 8px 24px rgba(35,45,107,.10), 0 2px 6px rgba(35,45,107,.06);
+
+  /* Mouvement */
+  --ease-out: cubic-bezier(.22,1,.36,1);
+  --dur-fast: 150ms; --dur-base: 300ms; --dur-slow: 500ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Chiffres tabulaires pour compteurs et indicateurs */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Animations d'apparition douces */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp var(--dur-base) var(--ease-out) both;
+}
+
+/* Décalage échelonné (stagger) */
+.delay-1 { animation-delay: 40ms; }
+.delay-2 { animation-delay: 80ms; }
+.delay-3 { animation-delay: 120ms; }
+.delay-4 { animation-delay: 160ms; }
+.delay-5 { animation-delay: 200ms; }
+.delay-6 { animation-delay: 240ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Cibles tactiles mobiles */
+.touch-target-min {
+  min-height: 44px;
+  min-width: 44px;
+}
