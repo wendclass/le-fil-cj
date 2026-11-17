@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   LogOut,
@@ -22,6 +23,7 @@ import {
   Lock,
   Clock,
   MessageSquare,
+  Edit3,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -130,7 +132,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       </div>
 
       {/* Profil & Badges de base */}
-      <Card className="p-6 sm:p-8 space-y-6">
+      <Card className="p-6 sm:p-8 space-y-6 border-t-4 border-t-[#F2B705]">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
           <div className="w-20 h-20 rounded-full overflow-hidden bg-primary/10 text-primary flex items-center justify-center font-display font-bold text-2xl border-2 border-border shadow-1 shrink-0">
             {profile.avatar_url ? (
@@ -147,11 +149,26 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </div>
 
           <div className="space-y-1.5 flex-1">
-            <h2 className="font-display font-bold text-xl text-text">
-              {profile.full_name || "Membre du Club"}
-            </h2>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="font-display font-bold text-xl text-text">
+                  {profile.full_name || "Membre du Club"}
+                </h2>
+                {profile.poste?.label && (
+                  <p className="text-[13px] text-text-muted font-body font-medium">
+                    {profile.poste.label}
+                  </p>
+                )}
+              </div>
+              <Link href="/mon-nom?returnUrl=/profil">
+                <Button variant="secondary" className="text-xs min-h-[36px] py-1 px-3 border border-primary">
+                  <Edit3 className="w-3.5 h-3.5 mr-1 text-primary" />
+                  <span>{copy.profile.editNameButton}</span>
+                </Button>
+              </Link>
+            </div>
             <p className="text-sm text-text-muted font-body">{profile.email}</p>
-            <div className="pt-1">
+            <div className="pt-1 flex flex-wrap items-center gap-2">
               <Badge variant={profile.role === "planner" ? "primary" : "neutral"}>
                 {profile.role === "planner" ? (
                   <span className="flex items-center gap-1.5">
@@ -165,12 +182,27 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   </span>
                 )}
               </Badge>
+              {profile.poste?.label && (
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-pill text-xs font-semibold bg-[#FFF3C4] text-[#232D6B] border border-[#F2B705]">
+                  {profile.poste.label}
+                </span>
+              )}
             </div>
           </div>
         </div>
 
         {/* Détails du compte */}
         <div className="border-t border-border pt-4 space-y-3 text-sm">
+          <div className="flex items-center justify-between py-1.5 border-b border-border/60">
+            <span className="text-text-muted">Nom complet</span>
+            <span className="font-medium text-text">{profile.full_name || "—"}</span>
+          </div>
+          {profile.poste?.label && (
+            <div className="flex items-center justify-between py-1.5 border-b border-border/60">
+              <span className="text-text-muted">{copy.profile.posteLabel}</span>
+              <span className="font-semibold text-primary">{profile.poste.label}</span>
+            </div>
+          )}
           <div className="flex items-center justify-between py-1.5 border-b border-border/60">
             <span className="text-text-muted">{copy.profile.emailLabel}</span>
             <span className="font-medium text-text">{profile.email}</span>
@@ -194,7 +226,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-accent" />
+            <Sparkles className="w-5 h-5 text-[#F2B705]" />
             <h2 className="font-display font-bold text-lg text-primary">
               {copy.gamification.pointsLabel}
             </h2>
@@ -206,7 +238,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {/* Total des points */}
-          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-l-4 border-l-accent shadow-1">
+          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-t-4 border-t-[#F2B705] shadow-1">
             <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
               Score personnel
             </span>
@@ -220,12 +252,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </Card>
 
           {/* Série en cours */}
-          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-l-4 border-l-primary shadow-1">
+          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-t-4 border-t-[#187A4C] shadow-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
                 {copy.gamification.streakLabel}
               </span>
-              <Flame className="w-4 h-4 text-alert" />
+              <Flame className="w-4 h-4 text-[#F2B705]" />
             </div>
             <div className="flex items-baseline gap-1 font-display font-extrabold text-3xl sm:text-4xl text-primary">
               <span>{profile.streak || 0}</span>
@@ -237,12 +269,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           </Card>
 
           {/* Record personnel */}
-          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-l-4 border-l-success shadow-1">
+          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-t-4 border-t-primary shadow-1">
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
                 {copy.gamification.bestStreakLabel}
               </span>
-              <Award className="w-4 h-4 text-success" />
+              <Award className="w-4 h-4 text-[#187A4C]" />
             </div>
             <div className="flex items-baseline gap-1 font-display font-extrabold text-3xl sm:text-4xl text-primary">
               <span>{profile.best_streak || 0}</span>
@@ -284,11 +316,11 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                     : "bg-surface-muted/60 border-dashed border-border text-text-muted opacity-80"
                 }`}
               >
-                {/* Médaillon circulaire (bleu marine et ocre) */}
+                {/* Médaillon circulaire (vert et jaune) */}
                 <div
                   className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
                     isEarned
-                      ? "bg-[#232D6B] text-[#D4A017] shadow-md ring-4 ring-[#F7E7C4]/60 animate-badge-celebrate"
+                      ? "bg-[#187A4C] text-[#FFF3C4] shadow-md ring-4 ring-[#FFF3C4] animate-badge-celebrate"
                       : "bg-border/60 text-text-muted ring-2 ring-transparent"
                   }`}
                   style={{
@@ -384,7 +416,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
           variant="ghost"
           onClick={handleLogout}
           isLoading={isLoggingOut}
-          className="text-xs text-alert hover:bg-alert/10 w-full sm:w-auto"
+          className="text-xs text-primary border border-primary/30 hover:bg-surface-muted w-full sm:w-auto"
         >
           <LogOut className="w-4 h-4 mr-1.5" />
           <span>{copy.profile.logoutButton}</span>

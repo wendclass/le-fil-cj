@@ -41,13 +41,13 @@ export const DueDateBadge: React.FC<DueDateBadgeProps> = ({ dueDate, className }
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill bg-alert text-white text-xs font-semibold shadow-1 select-none tabular-nums animate-fade-in-up",
+          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill bg-[#F2B705] text-[#232D6B] border-[1.5px] border-[#232D6B] text-xs font-bold select-none tabular-nums animate-fade-in-up",
           className
         )}
         title={`Échéance dépassée : ${formatOuagaDate(dueDate)}`}
       >
-        <AlertTriangle className="w-3.5 h-3.5" />
-        <span>{overdueText || "En retard"}</span>
+        <Clock className="w-3.5 h-3.5" />
+        <span>En retard ({overdueText || formatOuagaDate(dueDate)})</span>
       </span>
     );
   }
@@ -56,13 +56,13 @@ export const DueDateBadge: React.FC<DueDateBadgeProps> = ({ dueDate, className }
     return (
       <span
         className={cn(
-          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill bg-[#F7E7C4] text-[#232D6B] border border-accent/40 text-xs font-semibold select-none tabular-nums animate-fade-in-up",
+          "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-pill bg-[#FFF3C4] text-[#232D6B] border border-[#F2B705] text-xs font-semibold select-none tabular-nums animate-fade-in-up",
           className
         )}
         title={`Échéance proche : ${formatOuagaDate(dueDate)}`}
       >
         <Clock className="w-3.5 h-3.5" />
-        <span>Échéance {formatOuagaDate(dueDate)}</span>
+        <span>Bientôt ({formatOuagaDate(dueDate)})</span>
       </span>
     );
   }

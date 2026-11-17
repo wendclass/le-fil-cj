@@ -34,7 +34,7 @@ export default function ErrorPage({ error, reset }: ErrorProps) {
 
       <main className="flex-1 flex items-center justify-center p-4">
         <Card className="max-w-md w-full p-8 text-center space-y-6 shadow-2">
-          <div className="w-16 h-16 rounded-full bg-alert/10 text-alert flex items-center justify-center mx-auto">
+          <div className="w-16 h-16 rounded-full bg-[#FFF3C4] border-[1.5px] border-primary text-primary flex items-center justify-center mx-auto">
             <AlertTriangle className="w-8 h-8" />
           </div>
 

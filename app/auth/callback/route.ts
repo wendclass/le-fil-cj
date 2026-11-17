@@ -39,7 +39,7 @@ export async function GET(request: Request) {
 
   // Redirection selon première connexion ou retour habituel
   if (claimResult.first_login) {
-    return NextResponse.redirect(new URL("/bienvenue", request.url));
+    return NextResponse.redirect(new URL("/mon-nom?from=bienvenue", request.url));
   }
 
   return NextResponse.redirect(new URL(next, request.url));

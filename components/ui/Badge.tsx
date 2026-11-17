@@ -2,7 +2,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "neutral" | "primary" | "accent" | "success" | "alert";
+  variant?: "neutral" | "primary" | "accent" | "success" | "alert" | "yellow" | "yellow-soft" | "green" | "green-soft";
 }
 
 export const Badge: React.FC<BadgeProps> = ({
@@ -16,12 +16,16 @@ export const Badge: React.FC<BadgeProps> = ({
     neutral: "bg-surface-muted text-text-muted border border-border",
     // Bleu marine doux
     primary: "bg-primary/10 text-primary border border-primary/20",
-    // Ocre panafricain avec texte bleu marine (jamais de blanc sur ocre !)
-    accent: "bg-[#F7E7C4] text-[#232D6B] border border-accent/40 font-semibold",
+    // Jaune soleil avec texte bleu marine
+    accent: "bg-[#FFF3C4] text-[#232D6B] border border-[#F2B705] font-semibold",
+    yellow: "bg-[#F2B705] text-[#232D6B] border-[1.5px] border-[#232D6B] font-bold",
+    "yellow-soft": "bg-[#FFF3C4] text-[#232D6B] border border-[#F2B705] font-semibold",
     // Vert succès
-    success: "bg-success text-white",
-    // Rouge alerte
-    alert: "bg-alert text-white",
+    success: "bg-[#187A4C] text-white font-medium",
+    green: "bg-[#187A4C] text-white font-medium",
+    "green-soft": "bg-[#E1F3E8] text-[#0F4D30] border border-[#2DB36B]/30 font-semibold",
+    // Remplacement du rouge par le jaune avec bordure marine
+    alert: "bg-[#F2B705] text-[#232D6B] border-[1.5px] border-[#232D6B] font-bold",
   };
 
   return (

@@ -137,7 +137,7 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
       </div>
 
       {/* Carte principale de la décision */}
-      <Card className="p-6 sm:p-8 space-y-6">
+      <Card className="p-6 sm:p-8 space-y-6 border-t-4 border-t-[#187A4C]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Badge variant="primary">
             Publiée le {decision.published_at ? formatOuagaDate(decision.published_at) : "Récemment"}
@@ -151,9 +151,9 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
               )}
             </Badge>
           ) : isDeadlineExpired ? (
-            <Badge variant="alert">{copy.decisions.deadlineExpiredBadge}</Badge>
+            <Badge variant="yellow">{copy.decisions.deadlineExpiredBadge}</Badge>
           ) : (
-            <Badge variant="accent">{remainingText}</Badge>
+            <Badge variant="yellow-soft">{remainingText}</Badge>
           )}
         </div>
 
@@ -196,7 +196,7 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
               onClick={handleValidate}
               isLoading={isValidating}
               className={`min-h-[48px] px-8 text-base transition-transform duration-300 ${
-                validatedSuccess ? "scale-105 bg-success text-white" : ""
+                validatedSuccess ? "scale-105 bg-[#187A4C] text-white" : ""
               }`}
             >
               {validatedSuccess ? (
@@ -213,8 +213,8 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
 
         {/* Étiquette après deadline si non validée par tous */}
         {isDeadlineExpired && unvalidatedProfiles.length > 0 && (
-          <div className="p-3.5 rounded-md bg-alert/10 border border-alert/30 text-alert text-xs font-semibold flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
+          <div className="p-3.5 rounded-md bg-[#FFF3C4] border-[1.5px] border-primary text-primary text-xs font-semibold flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-primary" />
             <span>
               {copy.decisions.unvalidatedByCount(unvalidatedProfiles.length)}
             </span>
@@ -290,10 +290,17 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
                           key={p.id}
                           className="p-2.5 rounded-md bg-surface-muted border border-border flex items-center justify-between text-xs"
                         >
-                          <span className="font-medium text-text">
-                            {p.full_name || p.email}
-                          </span>
-                          <span className="text-[11px] text-text-muted">
+                          <div className="truncate">
+                            <span className="font-medium text-text block truncate">
+                              {p.full_name || p.email}
+                            </span>
+                            {p.poste?.label && (
+                              <span className="text-[11px] text-text-muted block truncate">
+                                {p.poste.label}
+                              </span>
+                            )}
+                          </div>
+                          <span className="text-[11px] text-text-muted shrink-0 ml-2">
                             {readAt ? formatOuagaDateTime(readAt) : "—"}
                           </span>
                         </div>
@@ -312,8 +319,8 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Ont validé */}
-            <Card className="p-5 space-y-3">
-              <h3 className="font-display font-bold text-sm text-success flex items-center gap-1.5">
+            <Card className="p-5 space-y-3 border-t-4 border-t-[#187A4C]">
+              <h3 className="font-display font-bold text-sm text-[#187A4C] flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{copy.decisions.validatedListTitle} ({validatedProfiles.length})</span>
               </h3>
@@ -327,9 +334,14 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
                       key={p.id}
                       className="p-2.5 rounded-md bg-surface-muted border border-border flex items-center justify-between text-xs"
                     >
-                      <span className="font-medium text-text">{p.full_name || p.email}</span>
-                      <span className="text-[11px] text-text-muted">
-                        {p.role === "planner" ? "Planificateur" : "Membre"}
+                      <div className="truncate">
+                        <span className="font-medium text-text block truncate">{p.full_name || p.email}</span>
+                        {p.poste?.label && (
+                          <span className="text-[11px] text-text-muted block truncate">{p.poste.label}</span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-text-muted shrink-0 ml-2">
+                        {p.poste?.label ? "" : p.role === "planner" ? "Planificateur" : "Membre"}
                       </span>
                     </div>
                   ))}
@@ -338,9 +350,9 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
             </Card>
 
             {/* N'ont pas encore validé */}
-            <Card className="p-5 space-y-3">
-              <h3 className="font-display font-bold text-sm text-alert flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4" />
+            <Card className="p-5 space-y-3 border-t-4 border-t-[#F2B705]">
+              <h3 className="font-display font-bold text-sm text-primary flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4 text-primary" />
                 <span>{copy.decisions.notValidatedListTitle} ({unvalidatedProfiles.length})</span>
               </h3>
 
@@ -351,11 +363,16 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
                   {unvalidatedProfiles.map((p) => (
                     <div
                       key={p.id}
-                      className="p-2.5 rounded-md bg-alert/5 border border-alert/20 flex items-center justify-between text-xs"
+                      className="p-2.5 rounded-md bg-[#FFF3C4]/60 border border-[#F2B705]/40 flex items-center justify-between text-xs"
                     >
-                      <span className="font-medium text-text">{p.full_name || p.email}</span>
-                      <span className="text-[11px] text-text-muted">
-                        {p.role === "planner" ? "Planificateur" : "Membre"}
+                      <div className="truncate">
+                        <span className="font-medium text-[#232D6B] block truncate">{p.full_name || p.email}</span>
+                        {p.poste?.label && (
+                          <span className="text-[11px] text-[#232D6B]/70 block truncate">{p.poste.label}</span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-[#232D6B]/70 shrink-0 ml-2">
+                        {p.poste?.label ? "" : p.role === "planner" ? "Planificateur" : "Membre"}
                       </span>
                     </div>
                   ))}

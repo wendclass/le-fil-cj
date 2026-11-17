@@ -273,8 +273,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ profile }) => {
         </div>
 
         {permission === "denied" && (
-          <div className="p-3.5 rounded-md bg-alert/10 border border-alert/30 text-alert text-xs flex items-center gap-2">
-            <AlertTriangle className="w-4 h-4 shrink-0" />
+          <div className="p-3.5 rounded-md bg-[#FFF3C4] border-[1.5px] border-primary text-primary text-xs font-medium flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4 shrink-0 text-primary" />
             <span>
               Les notifications sont bloquées dans les paramètres de ton navigateur. Modifie les autorisations du site pour les réactiver.
             </span>

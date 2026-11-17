@@ -6,10 +6,22 @@ export type TaskStatus = "todo" | "doing" | "done";
 export type PriorityStatus = "proposed" | "active" | "archived";
 export type RsvpStatus = "yes" | "no" | "maybe";
 
+export interface Poste {
+  id: string;
+  label: string;
+  rank: number;
+  created_at: string;
+}
+
 export interface Profile {
   id: string;
   email: string;
+  first_name?: string | null;
+  last_name?: string | null;
   full_name: string | null;
+  name_confirmed_at?: string | null;
+  poste_id?: string | null;
+  poste?: Poste | null;
   avatar_url: string | null;
   role: UserRole;
   phone?: string | null;
@@ -23,6 +35,10 @@ export interface Profile {
 export interface Invitation {
   email: string;
   role: UserRole;
+  first_name?: string | null;
+  last_name?: string | null;
+  poste_id?: string | null;
+  poste?: Poste | null;
   invited_by: string | null;
   created_at: string;
   claimed_at: string | null;

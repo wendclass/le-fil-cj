@@ -12,7 +12,7 @@ export const LiveMeetingBadge: React.FC<LiveMeetingBadgeProps> = ({ className })
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-alert text-white text-xs font-body font-semibold tracking-wide shadow-1 select-none",
+        "inline-flex items-center gap-1.5 px-3 py-1 rounded-pill bg-[#187A4C] text-white text-xs font-body font-semibold tracking-wide shadow-1 select-none",
         className
       )}
       role="status"

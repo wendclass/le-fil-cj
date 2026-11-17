@@ -46,36 +46,36 @@ export const PatternBand: React.FC<PatternBandProps> = ({
               stroke="#232D6B"
               strokeWidth="1.25"
             />
-            {/* Losange intérieur ocre */}
+            {/* Losange intérieur jaune soleil */}
             <path
               d="M 20 20 L 30 10 L 40 20 L 30 30 Z"
               fill="none"
-              stroke="#D99A1E"
+              stroke="#F2B705"
               strokeWidth="1.25"
             />
             <path
               d="M 60 20 L 70 10 L 80 20 L 70 30 Z"
               fill="none"
-              stroke="#D99A1E"
+              stroke="#F2B705"
               strokeWidth="1.25"
             />
-            {/* Chevrons et triangles géométriques */}
+            {/* Chevrons et triangles géométriques vert */}
             <path
               d="M 10 10 L 20 20 L 10 30"
               fill="none"
-              stroke="#232D6B"
-              strokeWidth="1"
+              stroke="#187A4C"
+              strokeWidth="1.1"
             />
             <path
               d="M 50 10 L 60 20 L 50 30"
               fill="none"
-              stroke="#232D6B"
-              strokeWidth="1"
+              stroke="#187A4C"
+              strokeWidth="1.1"
             />
-            {/* Ligne brisée ocre de séparation */}
+            {/* Ligne brisée jaune de séparation */}
             <path
               d="M 0 20 H 10 M 30 20 H 50 M 70 20 H 80"
-              stroke="#D99A1E"
+              stroke="#F2B705"
               strokeWidth="1"
               strokeDasharray="2 2"
             />

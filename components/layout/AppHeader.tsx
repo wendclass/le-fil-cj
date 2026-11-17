@@ -99,7 +99,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ profile }) => {
               <Bell className="w-5 h-5" />
               {unreadCount > 0 && (
                 <span
-                  className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 bg-alert text-white rounded-full text-[10px] font-bold flex items-center justify-center pointer-events-none"
+                  className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 bg-[#F2B705] text-[#232D6B] border border-[#232D6B]/20 rounded-full text-[10px] font-extrabold flex items-center justify-center pointer-events-none shadow-xs"
                   aria-label={`${unreadCount} notification${unreadCount > 1 ? "s" : ""} non lue${unreadCount > 1 ? "s" : ""}`}
                 >
                   {unreadCount > 99 ? "99+" : unreadCount}
@@ -114,7 +114,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ profile }) => {
             className="flex items-center gap-2 p-1 pl-1.5 pr-2.5 rounded-pill bg-white border border-border shadow-1 hover:shadow-2 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-target-min"
             title="Consulter mon profil"
           >
-            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-primary/10 text-primary flex items-center justify-center font-display font-bold text-xs">
+            <div className="relative w-8 h-8 rounded-full overflow-hidden bg-primary/10 text-primary flex items-center justify-center font-display font-bold text-xs shrink-0">
               {profile?.avatar_url && !avatarError ? (
                 <Image
                   src={profile.avatar_url}
@@ -128,9 +128,16 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ profile }) => {
                 <span>{initials}</span>
               )}
             </div>
-            <span className="text-sm font-medium text-text max-w-[100px] md:max-w-[140px] truncate hidden sm:inline">
-              {profile?.full_name?.split(" ")[0] || "Mon compte"}
-            </span>
+            <div className="flex flex-col text-left hidden sm:flex max-w-[100px] md:max-w-[140px]">
+              <span className="text-xs font-semibold text-text truncate leading-tight">
+                {profile?.first_name || profile?.full_name?.split(" ")[0] || "Mon compte"}
+              </span>
+              {profile?.poste?.label && (
+                <span className="text-[10px] text-text-muted truncate leading-tight">
+                  {profile.poste.label}
+                </span>
+              )}
+            </div>
           </Link>
         </div>
       </div>

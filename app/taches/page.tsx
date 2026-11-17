@@ -10,10 +10,10 @@ export default async function TachesPage() {
   const { profile } = await requireAuth();
   const supabase = await createClient();
 
-  // Récupérer toutes les tâches avec le profil du responsable
+  // Récupérer toutes les tâches avec le profil du responsable et son poste
   const { data: tasksData } = await supabase
     .from("tasks")
-    .select("*, profiles!tasks_assignee_id_fkey(*)")
+    .select("*, profiles!tasks_assignee_id_fkey(*, poste:postes(*))")
     .order("due_date", { ascending: true });
 
   const tasks = (tasksData || []).map((t: any) => ({
@@ -36,10 +36,10 @@ export default async function TachesPage() {
     .eq("status", "published")
     .order("published_at", { ascending: false });
 
-  // Récupérer la liste des membres pour les filtres et l'assignation
+  // Récupérer la liste des membres avec leur poste pour les filtres et l'assignation
   const { data: profilesData } = await supabase
     .from("profiles")
-    .select("*")
+    .select("*, poste:postes(*)")
     .order("full_name", { ascending: true });
 
   return (

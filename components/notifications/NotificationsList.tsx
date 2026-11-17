@@ -143,7 +143,7 @@ export const NotificationsList: React.FC<NotificationsListProps> = ({
               {copy.notifications.title}
             </h1>
             {unreadCount > 0 && (
-              <Badge variant="alert">
+              <Badge variant="yellow">
                 {unreadCount} non lue{unreadCount > 1 ? "s" : ""}
               </Badge>
             )}

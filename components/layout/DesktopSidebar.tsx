@@ -41,6 +41,16 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ profile }) => {
       : []),
   ];
 
+  const getIdentity = (href: string) => {
+    if (href === "/") return { activeBg: "bg-primary text-white", iconColor: "text-white" };
+    if (href.startsWith("/reunions")) return { activeBg: "bg-primary text-white", iconColor: "text-white" };
+    if (href.startsWith("/decisions")) return { activeBg: "bg-[#187A4C] text-white", iconColor: "text-white" };
+    if (href.startsWith("/taches")) return { activeBg: "bg-[#F2B705] text-[#232D6B] font-bold", iconColor: "text-[#232D6B]" };
+    if (href.startsWith("/indicateurs")) return { activeBg: "bg-[#187A4C] text-white", iconColor: "text-white" };
+    if (href.startsWith("/profil")) return { activeBg: "bg-[#F2B705] text-[#232D6B] font-bold", iconColor: "text-[#232D6B]" };
+    return { activeBg: "bg-primary text-white", iconColor: "text-white" };
+  };
+
   return (
     <aside
       className={cn(
@@ -75,6 +85,7 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ profile }) => {
                 ? pathname === "/"
                 : pathname.startsWith(item.href);
             const Icon = item.icon;
+            const iden = getIdentity(item.href);
 
             return (
               <Link
@@ -83,13 +94,13 @@ export const DesktopSidebar: React.FC<DesktopSidebarProps> = ({ profile }) => {
                 className={cn(
                   "flex items-center gap-3.5 px-3.5 py-3 rounded-pill text-sm font-medium transition-all duration-fast select-none touch-target-min",
                   isActive
-                    ? "bg-primary text-white shadow-1"
+                    ? cn(iden.activeBg, "shadow-1")
                     : "text-text-muted hover:text-primary hover:bg-surface-muted",
                   isCollapsed && "justify-center px-0"
                 )}
                 title={isCollapsed ? item.label : undefined}
               >
-                <Icon className={cn("w-5 h-5 shrink-0", isActive ? "text-white" : "text-current")} />
+                <Icon className={cn("w-5 h-5 shrink-0", isActive ? iden.iconColor : "text-current")} />
                 {!isCollapsed && <span className="truncate">{item.label}</span>}
               </Link>
             );

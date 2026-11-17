@@ -31,17 +31,25 @@ const config: Config = {
           hover: "var(--color-primary-hover)",
           foreground: "var(--color-on-primary)",
         },
-        alert: {
-          DEFAULT: "var(--color-alert)",
-          foreground: "var(--color-on-alert)",
+        yellow: {
+          DEFAULT: "var(--color-yellow)",
+          foreground: "var(--color-on-yellow)",
+          soft: "var(--color-yellow-soft)",
+        },
+        green: {
+          DEFAULT: "var(--color-green)",
+          foreground: "var(--color-on-green)",
+          bright: "var(--color-green-bright)",
+          soft: "var(--color-green-soft)",
+          ink: "var(--color-green-ink)",
         },
         accent: {
-          DEFAULT: "var(--color-accent)",
-          foreground: "var(--color-on-accent)",
+          DEFAULT: "var(--color-yellow)",
+          foreground: "var(--color-on-yellow)",
         },
         success: {
-          DEFAULT: "var(--color-success)",
-          foreground: "var(--color-on-success)",
+          DEFAULT: "var(--color-green)",
+          foreground: "var(--color-on-green)",
         },
       },
       fontFamily: {

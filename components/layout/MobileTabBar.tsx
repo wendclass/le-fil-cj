@@ -49,6 +49,16 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({ profile }) => {
     pathname.startsWith(item.href)
   );
 
+  const getIdentityColor = (href: string) => {
+    if (href === "/") return { icon: "text-[#232D6B]", text: "text-[#232D6B]" };
+    if (href.startsWith("/reunions")) return { icon: "text-[#232D6B]", text: "text-[#232D6B]" };
+    if (href.startsWith("/decisions")) return { icon: "text-[#187A4C]", text: "text-[#187A4C]" };
+    if (href.startsWith("/taches")) return { icon: "text-[#F2B705]", text: "text-[#232D6B]" };
+    if (href.startsWith("/indicateurs")) return { icon: "text-[#187A4C]", text: "text-[#187A4C]" };
+    if (href.startsWith("/profil")) return { icon: "text-[#F2B705]", text: "text-[#232D6B]" };
+    return { icon: "text-[#232D6B]", text: "text-[#232D6B]" };
+  };
+
   return (
     <>
       {/* Barre d'onglets fixe en bas (Mobile uniquement) */}
@@ -63,6 +73,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({ profile }) => {
                 ? pathname === "/"
                 : pathname.startsWith(tab.href);
             const Icon = tab.icon;
+            const iden = getIdentityColor(tab.href);
 
             return (
               <Link
@@ -70,10 +81,10 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({ profile }) => {
                 href={tab.href}
                 className={cn(
                   "flex flex-col items-center justify-center flex-1 py-1 min-h-[48px] rounded-lg transition-colors touch-target-min select-none",
-                  isActive ? "text-primary font-semibold" : "text-text-muted hover:text-primary"
+                  isActive ? cn(iden.text, "font-bold") : "text-text-muted hover:text-primary"
                 )}
               >
-                <Icon className={cn("w-5 h-5 mb-0.5", isActive ? "stroke-[2.5]" : "stroke-2")} />
+                <Icon className={cn("w-5 h-5 mb-0.5", isActive ? cn("stroke-[2.5]", iden.icon) : "stroke-2")} />
                 <span className="text-[11px] leading-tight tracking-tight">{tab.label}</span>
               </Link>
             );
@@ -127,6 +138,8 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({ profile }) => {
                 const isActive = pathname.startsWith(item.href);
                 const Icon = item.icon;
 
+                const iden = getIdentityColor(item.href);
+
                 return (
                   <Link
                     key={item.href}
@@ -135,7 +148,7 @@ export const MobileTabBar: React.FC<MobileTabBarProps> = ({ profile }) => {
                     className={cn(
                       "flex items-center gap-3.5 px-4 py-3.5 rounded-pill text-sm font-medium transition-all touch-target-min select-none",
                       isActive
-                        ? "bg-primary text-white shadow-1"
+                        ? cn(iden.icon === "text-[#F2B705]" ? "bg-[#F2B705] text-[#232D6B] font-bold" : iden.icon === "text-[#187A4C]" ? "bg-[#187A4C] text-white" : "bg-primary text-white", "shadow-1")
                         : "text-text hover:bg-surface-muted"
                     )}
                   >

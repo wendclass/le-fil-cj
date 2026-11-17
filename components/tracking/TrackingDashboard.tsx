@@ -89,7 +89,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
             <h2 className="font-display font-bold text-lg text-primary">
               {copy.tracking.blockUnseenTasks}
             </h2>
-            <Badge variant={unseenTasks.length > 0 ? "alert" : "neutral"}>
+            <Badge variant={unseenTasks.length > 0 ? "yellow" : "neutral"}>
               {unseenTasks.length}
             </Badge>
           </div>
@@ -97,7 +97,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
 
         {unseenTasks.length === 0 ? (
           <Card className="p-6 text-center text-sm text-text-muted italic bg-surface-muted">
-            <CheckCircle2 className="w-6 h-6 text-success mx-auto mb-2" />
+            <CheckCircle2 className="w-6 h-6 text-[#187A4C] mx-auto mb-2" />
             <p>{copy.tracking.emptyUnseenTasks}</p>
           </Card>
         ) : (
@@ -111,7 +111,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
               return (
                 <Card
                   key={t.id}
-                  className="p-5 border-l-4 border-l-alert space-y-3"
+                  className="p-5 border-l-4 border-l-[#F2B705] space-y-3"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="space-y-1">
@@ -128,12 +128,17 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
                           <strong className="text-text">
                             {t.assignee.full_name || t.assignee.email}
                           </strong>
+                          {t.assignee.poste?.label && (
+                            <span className="text-[11px] text-text-muted">
+                              ({t.assignee.poste.label})
+                            </span>
+                          )}
                         </span>
                         <span className="flex items-center gap-1">
                           <Calendar className="w-3.5 h-3.5 text-primary" />
                           Échéance : {formatOuagaDate(t.due_date)}
                         </span>
-                        <Badge variant="alert">Non ouverte depuis +24 h</Badge>
+                        <Badge variant="yellow">Non ouverte depuis +24 h</Badge>
                       </div>
                     </div>
 
@@ -176,7 +181,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
             <h2 className="font-display font-bold text-lg text-primary">
               {copy.tracking.blockUnseenDecisions}
             </h2>
-            <Badge variant={unreadDecisions.length > 0 ? "alert" : "neutral"}>
+            <Badge variant={unreadDecisions.length > 0 ? "yellow" : "neutral"}>
               {unreadDecisions.length}
             </Badge>
           </div>
@@ -184,7 +189,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
 
         {unreadDecisions.length === 0 ? (
           <Card className="p-6 text-center text-sm text-text-muted italic bg-surface-muted">
-            <CheckCircle2 className="w-6 h-6 text-success mx-auto mb-2" />
+            <CheckCircle2 className="w-6 h-6 text-[#187A4C] mx-auto mb-2" />
             <p>{copy.tracking.emptyUnseenDecisions}</p>
           </Card>
         ) : (
@@ -201,7 +206,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
               return (
                 <Card
                   key={d.id}
-                  className="p-5 border-l-4 border-l-accent space-y-3"
+                  className="p-5 border-l-4 border-l-[#F2B705] space-y-3"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div className="space-y-2">
@@ -214,14 +219,14 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
                       </Link>
 
                       <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <Badge variant="alert">
+                        <Badge variant="yellow">
                           {d.unreadMembers.length}/{d.totalMembers} non-lecteurs
                         </Badge>
                         <span className="text-text-muted">
                           Non lu par :{" "}
                           <strong className="text-text">
                             {d.unreadMembers
-                              .map((m) => m.full_name || m.email)
+                              .map((m) => m.full_name ? `${m.full_name}${m.poste?.label ? ` (${m.poste.label})` : ""}` : m.email)
                               .join(", ")}
                           </strong>
                         </span>
@@ -267,7 +272,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
             <h2 className="font-display font-bold text-lg text-primary">
               {copy.tracking.blockOverdueTasks}
             </h2>
-            <Badge variant={overdueTasks.length > 0 ? "alert" : "neutral"}>
+            <Badge variant={overdueTasks.length > 0 ? "yellow" : "neutral"}>
               {overdueTasks.length}
             </Badge>
           </div>
@@ -275,7 +280,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
 
         {overdueTasks.length === 0 ? (
           <Card className="p-6 text-center text-sm text-text-muted italic bg-surface-muted">
-            <CheckCircle2 className="w-6 h-6 text-success mx-auto mb-2" />
+            <CheckCircle2 className="w-6 h-6 text-[#187A4C] mx-auto mb-2" />
             <p>{copy.tracking.emptyOverdueTasks}</p>
           </Card>
         ) : (
@@ -289,7 +294,7 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
               return (
                 <Card
                   key={t.id}
-                  className="p-5 border-l-4 border-l-alert space-y-3"
+                  className="p-5 border-l-4 border-l-[#F2B705] space-y-3"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div className="space-y-1">
@@ -306,12 +311,17 @@ export const TrackingDashboard: React.FC<TrackingDashboardProps> = ({
                           <strong className="text-text">
                             {t.assignee.full_name || t.assignee.email}
                           </strong>
+                          {t.assignee.poste?.label && (
+                            <span className="text-[11px] text-text-muted">
+                              ({t.assignee.poste.label})
+                            </span>
+                          )}
                         </span>
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-alert" />
+                          <Calendar className="w-3.5 h-3.5 text-primary" />
                           Échéance : {formatOuagaDate(t.due_date)}
                         </span>
-                        <Badge variant="alert">
+                        <Badge variant="yellow">
                           En retard ({t.daysLate} jour{t.daysLate > 1 ? "s" : ""})
                         </Badge>
                       </div>

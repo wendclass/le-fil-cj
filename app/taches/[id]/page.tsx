@@ -28,7 +28,7 @@ export default async function TacheDetailPage({ params }: PageProps) {
     return (
       <AppShell profile={profile}>
         <Card className="max-w-md mx-auto text-center py-12 px-6 space-y-4">
-          <h1 className="font-display font-bold text-xl text-alert">
+          <h1 className="font-display font-bold text-xl text-primary">
             Tâche introuvable
           </h1>
           <p className="text-sm text-text-muted">
@@ -49,7 +49,7 @@ export default async function TacheDetailPage({ params }: PageProps) {
   if (taskData.assignee_id) {
     const { data: aData } = await supabase
       .from("profiles")
-      .select("*")
+      .select("*, poste:postes(*)")
       .eq("id", taskData.assignee_id)
       .single();
     if (aData) assignee = aData as Profile;

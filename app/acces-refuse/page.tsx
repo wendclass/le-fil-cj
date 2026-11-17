@@ -36,7 +36,7 @@ export default function AccesRefusePage() {
               <Logo variant="full" />
             </div>
 
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-alert/10 text-alert mx-auto">
+            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#FFF3C4] border-[1.5px] border-primary text-primary mx-auto">
               <ShieldAlert className="w-8 h-8" />
             </div>
 

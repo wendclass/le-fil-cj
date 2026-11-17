@@ -371,17 +371,17 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
       {/* Bloc « À faire maintenant » */}
       {hasImmediateActions && (
-        <Card className="p-5 border-l-4 border-l-alert space-y-4 shadow-1">
+        <Card className="p-5 border-l-4 border-l-[#F2B705] space-y-4 shadow-1">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-full bg-alert/15 text-alert">
-                <AlertTriangle className="w-4 h-4" />
+              <div className="p-1.5 rounded-full bg-[#FFF3C4] text-[#232D6B]">
+                <AlertTriangle className="w-4 h-4 text-[#232D6B]" />
               </div>
               <h2 className="font-display font-bold text-base text-primary">
                 À faire maintenant
               </h2>
             </div>
-            <span className="text-xs font-semibold text-alert">
+            <span className="text-xs font-semibold text-[#232D6B]">
               Actions prioritaires
             </span>
           </div>
@@ -391,11 +391,11 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               <Link href="/decisions" className="block">
                 <div className="p-3.5 rounded-md bg-surface-muted hover:bg-white border border-border space-y-1 transition-all">
                   <div className="flex items-center justify-between text-xs font-semibold text-text">
-                    <span className="flex items-center gap-1.5 text-alert">
-                      <CheckSquare className="w-4 h-4" />
+                    <span className="flex items-center gap-1.5 text-primary">
+                      <CheckSquare className="w-4 h-4 text-primary" />
                       Décisions
                     </span>
-                    <Badge variant="alert">{decisionsToValidate.length}</Badge>
+                    <Badge variant="yellow">{decisionsToValidate.length}</Badge>
                   </div>
                   <p className="text-xs text-text-muted line-clamp-1">
                     {decisionsToValidate[0].text}
@@ -408,11 +408,11 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               <Link href={`/taches/${urgentTasks[0].id}`} className="block">
                 <div className="p-3.5 rounded-md bg-surface-muted hover:bg-white border border-border space-y-1 transition-all">
                   <div className="flex items-center justify-between text-xs font-semibold text-text">
-                    <span className="flex items-center gap-1.5 text-alert">
-                      <Clock className="w-4 h-4" />
+                    <span className="flex items-center gap-1.5 text-primary">
+                      <Clock className="w-4 h-4 text-primary" />
                       Tâches urgentes
                     </span>
-                    <Badge variant="alert">{urgentTasks.length}</Badge>
+                    <Badge variant="yellow">{urgentTasks.length}</Badge>
                   </div>
                   <p className="text-xs text-text-muted line-clamp-1">
                     {urgentTasks[0].title}
@@ -585,7 +585,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Link href="/suivi" className="block">
                 <div className="p-3 rounded-md bg-surface-muted hover:bg-white border border-border text-center space-y-1 transition-all">
-                  <span className="text-2xl font-bold font-display text-alert block">
+                  <span className="text-2xl font-bold font-display text-primary block">
                     {plannerWatchlist?.unseenCount || 0}
                   </span>
                   <span className="text-xs font-medium text-text-muted">
@@ -596,7 +596,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
               <Link href="/suivi" className="block">
                 <div className="p-3 rounded-md bg-surface-muted hover:bg-white border border-border text-center space-y-1 transition-all">
-                  <span className="text-2xl font-bold font-display text-alert block">
+                  <span className="text-2xl font-bold font-display text-primary block">
                     {plannerWatchlist?.overdueCount || 0}
                   </span>
                   <span className="text-xs font-medium text-text-muted">
@@ -777,7 +777,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                       onClick={() => handleRsvp(nextMeeting.id, "no")}
                       className={`py-2 px-2 rounded-pill text-xs font-semibold border transition-all touch-target-min flex items-center justify-center ${
                         nextMeeting.user_rsvp === "no"
-                          ? "bg-alert text-white border-alert shadow-1"
+                          ? "bg-surface-muted text-text border-primary/40 shadow-1"
                           : "bg-white text-text border-border hover:bg-surface-muted"
                       }`}
                     >
@@ -797,12 +797,12 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </Card>
 
         {/* À valider (Décisions en attente de l'utilisateur) */}
-        <Card staggerIndex={2} className="flex flex-col justify-between space-y-4">
+        <Card staggerIndex={2} className="flex flex-col justify-between space-y-4 border-t-4 border-t-primary">
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-full bg-alert/10 text-alert">
-                  <CheckSquare className="w-5 h-5" />
+                <div className="p-2 rounded-full bg-[#FFF3C4] text-primary">
+                  <CheckSquare className="w-5 h-5 text-primary" />
                 </div>
                 <h2 className="font-display font-bold text-lg text-primary">
                   {copy.home.toValidate.sectionTitle}
@@ -810,7 +810,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               </div>
 
               {decisionsToValidate.length > 0 && (
-                <Badge variant="alert">{decisionsToValidate.length} en attente</Badge>
+                <Badge variant="yellow">{decisionsToValidate.length} en attente</Badge>
               )}
             </div>
 
@@ -839,7 +839,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                           {decision.text}
                         </Link>
                         {mounted && decision.validation_deadline && (
-                          <span className="text-xs text-alert font-medium block tabular-nums">
+                          <span className="text-xs text-primary font-medium block tabular-nums">
                             {formatValidationRemaining(decision.validation_deadline)}
                           </span>
                         )}
@@ -850,7 +850,7 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
                         onClick={() => handleValidateDecision(decision.id)}
                         isLoading={isValidating}
                         className={`text-xs px-3.5 py-1.5 min-h-[38px] shrink-0 transition-transform duration-300 ${
-                          isSuccess ? "scale-105 bg-success text-white border-success" : ""
+                          isSuccess ? "scale-105 bg-[#187A4C] text-white border-[#187A4C]" : ""
                         }`}
                       >
                         {isSuccess ? (

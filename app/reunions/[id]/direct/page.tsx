@@ -27,7 +27,7 @@ export default async function ReunionDirectPage({ params }: PageProps) {
     return (
       <AppShell profile={profile}>
         <Card className="max-w-md mx-auto text-center py-12 px-6 space-y-4">
-          <h1 className="font-display font-bold text-xl text-alert">
+          <h1 className="font-display font-bold text-xl text-primary">
             Réunion introuvable
           </h1>
           <p className="text-sm text-text-muted">
@@ -62,10 +62,10 @@ export default async function ReunionDirectPage({ params }: PageProps) {
     .select("*, tasks(*)")
     .eq("meeting_id", params.id);
 
-  // Tous les membres pour l'appel et l'assignation de tâches
+  // Tous les membres pour l'appel et l'assignation de tâches avec leur poste
   const { data: profilesData } = await supabase
     .from("profiles")
-    .select("*")
+    .select("*, poste:postes(*)")
     .order("full_name", { ascending: true });
 
   return (

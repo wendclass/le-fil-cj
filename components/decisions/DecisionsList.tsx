@@ -148,7 +148,7 @@ export const DecisionsList: React.FC<DecisionsListProps> = ({
                 href={`/decisions/${decision.id}`}
                 className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
               >
-                <Card className="p-5 hover:border-primary/40 transition-all space-y-4">
+                <Card className="p-5 hover:border-[#187A4C]/40 border-t-4 border-t-[#187A4C] transition-all space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
                     <div className="space-y-1.5 flex-1">
                       <h2 className="font-display font-bold text-base sm:text-lg text-primary leading-snug">
@@ -169,9 +169,9 @@ export const DecisionsList: React.FC<DecisionsListProps> = ({
                           Validé par toi
                         </Badge>
                       ) : isDeadlineExpired ? (
-                        <Badge variant="alert">{copy.decisions.deadlineExpiredBadge}</Badge>
+                        <Badge variant="yellow">{copy.decisions.deadlineExpiredBadge}</Badge>
                       ) : (
-                        <Badge variant="accent">{remainingText}</Badge>
+                        <Badge variant="yellow-soft">{remainingText}</Badge>
                       )}
                     </div>
                   </div>
@@ -190,7 +190,7 @@ export const DecisionsList: React.FC<DecisionsListProps> = ({
 
                     <div className="w-full h-2 rounded-pill bg-surface-muted overflow-hidden border border-border">
                       <div
-                        className="h-full bg-success rounded-pill transition-all duration-base"
+                        className="h-full bg-[#187A4C] rounded-pill transition-all duration-base"
                         style={{ width: `${percent}%` }}
                       />
                     </div>

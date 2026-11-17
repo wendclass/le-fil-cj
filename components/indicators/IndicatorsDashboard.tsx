@@ -60,10 +60,11 @@ interface IndicatorsDashboardProps {
   initialPeriod: string;
 }
 
-// Mini-courbe SVG sur 6 mois (bleu marine #232D6B)
-const Sparkline: React.FC<{ values: number[]; target: number }> = ({
+// Mini-courbe SVG sur 6 mois (série principale bleu marine #232D6B, série secondaire vert #187A4C)
+const Sparkline: React.FC<{ values: number[]; target: number; secondaryValues?: number[] }> = ({
   values,
   target,
+  secondaryValues,
 }) => {
   const width = 120;
   const height = 40;
@@ -82,7 +83,20 @@ const Sparkline: React.FC<{ values: number[]; target: number }> = ({
     return `${x},${y}`;
   });
 
+  const secPoints = secondaryValues
+    ? secondaryValues.map((val, idx) => {
+        const x = padding + (idx / (secondaryValues.length - 1)) * (width - 2 * padding);
+        const y =
+          height -
+          padding -
+          ((Math.min(Math.max(val, min), max) - min) / (max - min)) *
+            (height - 2 * padding);
+        return `${x},${y}`;
+      })
+    : null;
+
   const pathD = `M ${points.join(" L ")}`;
+  const secPathD = secPoints ? `M ${secPoints.join(" L ")}` : null;
 
   return (
     <div className="flex flex-col items-end gap-1">
@@ -99,10 +113,22 @@ const Sparkline: React.FC<{ values: number[]; target: number }> = ({
           y1={height - padding - (target / 100) * (height - 2 * padding)}
           x2={width - padding}
           y2={height - padding - (target / 100) * (height - 2 * padding)}
-          stroke="#E5E7EB"
+          stroke="#E7E1D3"
           strokeWidth="1"
           strokeDasharray="2,2"
         />
+        {/* Série secondaire vert si présente */}
+        {secPathD && (
+          <path
+            d={secPathD}
+            fill="none"
+            stroke="#187A4C"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeDasharray="3,3"
+          />
+        )}
         {/* Courbe bleu marine */}
         <path
           d={pathD}
@@ -209,11 +235,11 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
       {/* Grille des 5 indicateurs */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* 1. La Seule Chose du club */}
-        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-accent shadow-1">
+        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-[#187A4C] bg-[#FFF3C4]/30 shadow-1">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-accent font-display flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-accent" />
+              <span className="text-xs font-bold uppercase text-primary font-display flex items-center gap-1.5">
+                <Target className="w-4 h-4 text-primary" />
                 Objectif 100 %
               </span>
               <Badge variant="neutral">Priorité</Badge>
@@ -237,6 +263,7 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
                   <Sparkline
                     values={[0, 20, 35, 50, 70, data.priority.percent]}
                     target={100}
+                    secondaryValues={[0, 15, 30, 45, 60, 80]}
                   />
                 </div>
                 <div className="space-y-1.5 text-xs">
@@ -248,7 +275,7 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
                   </div>
                   <div className="w-full h-2 rounded-full bg-border overflow-hidden">
                     <div
-                      className="h-full bg-accent transition-all duration-500 rounded-full"
+                      className="h-full bg-[#187A4C] transition-all duration-500 rounded-full"
                       style={{ width: `${data.priority.percent}%` }}
                     />
                   </div>
@@ -273,7 +300,7 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
         </Card>
 
         {/* 2. Tâches terminées dans les délais */}
-        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-primary shadow-1">
+        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-[#187A4C] bg-white shadow-1">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase text-primary font-display flex items-center gap-1.5">
@@ -312,8 +339,8 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
                     <span
                       className={`font-semibold flex items-center gap-0.5 ${
                         data.ontime_tasks.diff_prev > 0
-                          ? "text-success"
-                          : "text-alert"
+                          ? "text-[#187A4C]"
+                          : "text-text-muted"
                       }`}
                     >
                       {data.ontime_tasks.diff_prev > 0 ? (
@@ -348,16 +375,16 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
         </Card>
 
         {/* 3. Décisions validées */}
-        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-success shadow-1">
+        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-[#187A4C] bg-[#E1F3E8]/40 shadow-1">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-success font-display flex items-center gap-1.5">
-                <FileCheck2 className="w-4 h-4 text-success" />
+              <span className="text-xs font-bold uppercase text-[#0F4D30] font-display flex items-center gap-1.5">
+                <FileCheck2 className="w-4 h-4 text-[#187A4C]" />
                 Objectif 90 %
               </span>
               <Badge variant="neutral">Adhésion</Badge>
             </div>
-            <h2 className="font-display font-bold text-base text-text">
+            <h2 className="font-display font-bold text-base text-[#0F4D30]">
               {copy.indicators.cards.validatedDecisions.title}
             </h2>
             <p className="text-xs text-text-muted leading-relaxed">
@@ -402,11 +429,11 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
         </Card>
 
         {/* 4. Respect des 45 minutes */}
-        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-accent shadow-1">
+        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-[#187A4C] bg-[#FFF3C4]/30 shadow-1">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-accent font-display flex items-center gap-1.5">
-                <Clock className="w-4 h-4 text-accent" />
+              <span className="text-xs font-bold uppercase text-primary font-display flex items-center gap-1.5">
+                <Clock className="w-4 h-4 text-primary" />
                 Objectif 100 %
               </span>
               <Badge variant="neutral">Efficacité</Badge>
@@ -456,16 +483,16 @@ export const IndicatorsDashboard: React.FC<IndicatorsDashboardProps> = ({
         </Card>
 
         {/* 5. Assiduité aux réunions */}
-        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-primary shadow-1">
+        <Card className="p-6 flex flex-col justify-between space-y-6 border-t-4 border-t-[#187A4C] bg-[#E1F3E8]/40 shadow-1">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold uppercase text-primary font-display flex items-center gap-1.5">
-                <Users className="w-4 h-4 text-primary" />
+              <span className="text-xs font-bold uppercase text-[#0F4D30] font-display flex items-center gap-1.5">
+                <Users className="w-4 h-4 text-[#187A4C]" />
                 Objectif 75 %
               </span>
               <Badge variant="neutral">Assiduité</Badge>
             </div>
-            <h2 className="font-display font-bold text-base text-text">
+            <h2 className="font-display font-bold text-base text-[#0F4D30]">
               {copy.indicators.cards.participation.title}
             </h2>
             <p className="text-xs text-text-muted leading-relaxed">

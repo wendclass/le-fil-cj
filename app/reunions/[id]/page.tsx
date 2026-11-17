@@ -29,7 +29,7 @@ export default async function ReunionDetailPage({ params, searchParams }: PagePr
     return (
       <AppShell profile={profile}>
         <Card className="max-w-md mx-auto text-center py-12 px-6 space-y-4">
-          <h1 className="font-display font-bold text-xl text-alert">
+          <h1 className="font-display font-bold text-xl text-primary">
             Cette réunion n’existe plus
           </h1>
           <p className="text-sm text-text-muted">
@@ -64,10 +64,10 @@ export default async function ReunionDetailPage({ params, searchParams }: PagePr
     .select("*")
     .eq("meeting_id", params.id);
 
-  // Récupérer la liste des profils pour la vue des planificateurs
+  // Récupérer la liste des profils avec leur poste
   const { data: profilesData } = await supabase
     .from("profiles")
-    .select("*")
+    .select("*, poste:postes(*)")
     .order("full_name", { ascending: true });
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";

@@ -127,7 +127,7 @@ export const MeetingsList: React.FC<MeetingsListProps> = ({
               href={`/reunions/${meeting.id}`}
               className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md"
             >
-              <Card className="p-5 hover:border-primary/40 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <Card className="p-5 hover:border-primary/40 border-t-4 border-t-primary transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="space-y-2 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h2 className="font-display font-bold text-lg text-primary">
@@ -136,7 +136,7 @@ export const MeetingsList: React.FC<MeetingsListProps> = ({
                     {meeting.status === "live" && <LiveMeetingBadge />}
                     {meeting.is_improvised && <ImprovisedBadge />}
                     {meeting.status === "cancelled" && (
-                      <Badge variant="alert">Annulée</Badge>
+                      <Badge variant="neutral">Annulée</Badge>
                     )}
                     {meeting.status === "done" && (
                       <Badge variant="success">Terminée</Badge>
@@ -176,7 +176,7 @@ export const MeetingsList: React.FC<MeetingsListProps> = ({
                             ? "success"
                             : meeting.user_rsvp === "maybe"
                             ? "accent"
-                            : "alert"
+                            : "neutral"
                         }
                       >
                         {meeting.user_rsvp === "yes"

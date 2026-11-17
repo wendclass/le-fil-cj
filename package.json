@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "seed": "tsx scripts/seed-planners.ts"
+    "seed": "tsx scripts/seed-planners.ts",
+    "check:no-red": "tsx scripts/check-no-red.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.5.2",

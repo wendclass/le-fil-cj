@@ -110,7 +110,7 @@ export const TaskDetailView: React.FC<TaskDetailViewProps> = ({
         </div>
       </div>
 
-      <Card className="p-6 sm:p-8 space-y-6">
+      <Card className="p-6 sm:p-8 space-y-6 border-t-4 border-t-[#F2B705]">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <Badge
             variant={
@@ -150,7 +150,14 @@ export const TaskDetailView: React.FC<TaskDetailViewProps> = ({
               <User className="w-4 h-4 text-primary" />
               Responsable
             </span>
-            <span className="font-semibold text-text">{assigneeName}</span>
+            <div className="text-right">
+              <span className="font-semibold text-text">{assigneeName}</span>
+              {assignee?.poste?.label && (
+                <div className="text-[12px] text-text-muted font-body">
+                  {assignee.poste.label}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center justify-between py-1.5 border-b border-border/60">
@@ -171,7 +178,9 @@ export const TaskDetailView: React.FC<TaskDetailViewProps> = ({
               </span>
               <span
                 className={`font-semibold text-xs ${
-                  assigneeReadAt ? "text-text" : "text-alert"
+                  assigneeReadAt
+                    ? "text-text"
+                    : "text-[#232D6B] bg-[#FFF3C4] px-2.5 py-0.5 rounded-full border border-[#F2B705]"
                 }`}
               >
                 {assigneeReadAt

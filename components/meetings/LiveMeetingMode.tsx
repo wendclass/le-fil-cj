@@ -541,8 +541,8 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
     <div className="space-y-6 max-w-4xl mx-auto animate-fade-in-up pb-20">
       {/* Bandeau d'état réseau */}
       {!isOnline && (
-        <div className="p-3 bg-alert text-white rounded-md flex items-center gap-2 text-xs font-semibold shadow-2 animate-pulse">
-          <WifiOff className="w-4 h-4 shrink-0" />
+        <div className="p-3 bg-[#232D6B] text-white border border-[#F2B705] rounded-md flex items-center gap-2 text-xs font-semibold shadow-2">
+          <WifiOff className="w-4 h-4 shrink-0 text-[#F2B705]" />
           <span>{copy.meetings.live.offlineWarning}</span>
         </div>
       )}
@@ -551,11 +551,11 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border pb-4">
         <div className="space-y-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-xs font-bold uppercase tracking-wider text-accent font-display">
+            <span className="text-xs font-bold uppercase tracking-wider text-primary font-display">
               Mode Réunion en Direct
             </span>
             {meeting.status === "live" && <LiveMeetingBadge />}
-            {meeting.overrun && <Badge variant="alert">Prolongée</Badge>}
+            {meeting.overrun && <Badge variant="yellow">Prolongée</Badge>}
           </div>
           <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-primary">
             {meeting.title}
@@ -571,8 +571,8 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
 
       {/* ÉCRAN DE DÉMARRAGE SI RÉUNION ENCORE PLANIFIÉE */}
       {meeting.status === "planned" && (
-        <Card className="text-center py-12 px-6 space-y-6 shadow-2">
-          <div className="w-16 h-16 rounded-full bg-alert/15 text-alert flex items-center justify-center mx-auto">
+        <Card className="text-center py-12 px-6 space-y-6 shadow-2 border-t-4 border-t-primary">
+          <div className="w-16 h-16 rounded-full bg-[#187A4C]/15 text-[#187A4C] flex items-center justify-center mx-auto">
             <Radio className="w-8 h-8 animate-pulse" />
           </div>
 
@@ -586,7 +586,7 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
           </div>
 
           <Button
-            variant="danger"
+            variant="green"
             onClick={handleStartMeeting}
             className="text-lg py-4 px-8 min-h-[56px] shadow-2"
           >
@@ -673,15 +673,22 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
           <Card
             className={`p-6 sm:p-8 text-center space-y-4 transition-colors ${
               isTimeOver
-                ? "bg-alert/10 border-alert text-alert"
+                ? "bg-[#F2B705] border-2 border-primary text-[#232D6B] motion-safe:animate-[pulse_2s_ease-in-out_infinite]"
                 : elapsedPercent >= 80
-                ? "bg-[#F7E7C4]/40 border-accent"
+                ? "bg-[#FFF3C4] border-2 border-[#F2B705] text-[#232D6B]"
                 : "bg-white"
             }`}
           >
-            <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
-              {copy.meetings.live.timeRemaining} (sur {meeting.planned_minutes + extendedMinutes} min)
-            </span>
+            <div className="flex items-center justify-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-text-muted">
+                {copy.meetings.live.timeRemaining} (sur {meeting.planned_minutes + extendedMinutes} min)
+              </span>
+              {isTimeOver && (
+                <span className="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-pill bg-primary text-white">
+                  Temps écoulé
+                </span>
+              )}
+            </div>
 
             {/* Grands chiffres Sora 800 */}
             <div
@@ -704,14 +711,14 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
             <div className="max-w-md mx-auto w-full h-3 rounded-pill bg-surface-muted overflow-hidden border border-border">
               <div
                 className={`h-full rounded-pill transition-all duration-fast ${
-                  isTimeOver ? "bg-alert" : elapsedPercent >= 80 ? "bg-accent" : "bg-primary"
+                  isTimeOver ? "bg-primary" : elapsedPercent >= 80 ? "bg-[#F2B705]" : "bg-[#187A4C]"
                 }`}
                 style={{ width: `${Math.min(100, elapsedPercent)}%` }}
               />
             </div>
 
             {elapsedPercent >= 80 && !isTimeOver && (
-              <p className="text-xs font-semibold text-accent">
+              <p className="text-xs font-bold text-primary">
                 {copy.meetings.live.softAlert80}
               </p>
             )}
@@ -719,9 +726,9 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
             {isTimeOver && (
               <div className="pt-2">
                 <Button
-                  variant="danger"
+                  variant="secondary"
                   onClick={() => setShowOverrunModal(true)}
-                  className="text-xs py-2 px-4"
+                  className="text-xs py-2 px-4 border-2 border-primary text-primary font-bold"
                 >
                   Gérer le dépassement de temps
                 </Button>
@@ -747,11 +754,12 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
                   <span
                     className={`text-xs font-bold tabular-nums px-2.5 py-1 rounded-pill ${
                       isItemOvertime
-                        ? "bg-alert text-white animate-pulse"
+                        ? "bg-[#F2B705] text-primary border border-primary font-bold motion-safe:animate-pulse"
                         : "bg-surface-muted text-text"
                     }`}
                   >
-                    {isItemOvertime ? "+" : ""}
+                    {isItemOvertime ? "+ " : ""}
+                    {isItemOvertime ? "Temps écoulé · " : ""}
                     {Math.abs(Math.floor(itemRemainingSec / 60))}:
                     {String(Math.abs(itemRemainingSec % 60)).padStart(2, "0")}
                   </span>
@@ -860,16 +868,21 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
                         onClick={() => handleTogglePresent(p.id, isPresent)}
                         className={`p-2 rounded-sm border cursor-pointer select-none flex items-center justify-between text-xs transition-all ${
                           isPresent
-                            ? "bg-success/15 border-success text-success font-semibold"
+                            ? "bg-[#E1F3E8] border-[#187A4C] text-[#0F4D30] font-semibold"
                             : "bg-surface-muted border-border text-text hover:bg-surface-muted/80"
                         }`}
                       >
-                        <span className="truncate">{p.full_name || p.email}</span>
+                        <div className="truncate">
+                          <span className="truncate block font-medium">{p.full_name || p.email}</span>
+                          {p.poste?.label && (
+                            <span className="text-[10px] text-text-muted block truncate">{p.poste.label}</span>
+                          )}
+                        </div>
                         <input
                           type="checkbox"
                           checked={isPresent}
                           onChange={() => {}}
-                          className="w-4 h-4 accent-success cursor-pointer"
+                          className="w-4 h-4 accent-[#187A4C] cursor-pointer"
                         />
                       </div>
                     );
@@ -971,10 +984,10 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
           {/* Bouton Clôturer la réunion */}
           <div className="pt-4 flex justify-end">
             <Button
-              variant="danger"
+              variant="secondary"
               onClick={handleFinishMeeting}
               isLoading={isFinishing}
-              className="text-base py-3 px-8"
+              className="text-base py-3 px-8 border-2 border-primary text-primary font-bold"
             >
               {copy.meetings.live.finishMeetingButton}
             </Button>
@@ -989,14 +1002,14 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
           onClick={() => setShowOverrunModal(false)}
         >
           <div
-            className="bg-white rounded-lg border-2 border-alert shadow-2 max-w-md w-full p-6 space-y-5"
+            className="bg-white rounded-lg border-2 border-[#F2B705] shadow-2 max-w-md w-full p-6 space-y-5"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-labelledby="overrun-modal-title"
           >
-            <div className="flex items-center gap-3 text-alert">
-              <AlertTriangle className="w-8 h-8 shrink-0" />
-              <h3 id="overrun-modal-title" className="font-display font-extrabold text-xl text-alert">
+            <div className="flex items-center gap-3 text-primary">
+              <AlertTriangle className="w-8 h-8 shrink-0 text-primary" />
+              <h3 id="overrun-modal-title" className="font-display font-extrabold text-xl text-primary">
                 {copy.meetings.live.timeOverTitle}
               </h3>
             </div>
@@ -1007,15 +1020,15 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
 
             <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
               <Button
-                variant="danger"
+                variant="secondary"
                 onClick={handleFinishMeeting}
-                className="w-full text-sm"
+                className="w-full text-sm border-2 border-primary text-primary font-bold"
               >
                 {copy.meetings.live.closeNowButton}
               </Button>
 
               <Button
-                variant="secondary"
+                variant="primary"
                 onClick={handleExtendMeeting}
                 className="w-full text-sm"
               >

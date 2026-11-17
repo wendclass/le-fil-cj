@@ -15,14 +15,14 @@ export async function getCurrentProfile(): Promise<{ profile: Profile | null; us
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("*")
+    .select("*, poste:postes(*)")
     .eq("id", user.id)
     .single();
 
   return { profile: profile as Profile | null, user };
 }
 
-export async function requireAuth(): Promise<{ profile: Profile; user: any }> {
+export async function requireAuth(options?: { allowUnconfirmedName?: boolean }): Promise<{ profile: Profile; user: any }> {
   const { profile, user } = await getCurrentProfile();
 
   if (!user) {
@@ -31,6 +31,10 @@ export async function requireAuth(): Promise<{ profile: Profile; user: any }> {
 
   if (!profile) {
     redirect("/acces-refuse");
+  }
+
+  if (!profile.name_confirmed_at && !options?.allowUnconfirmedName) {
+    redirect("/mon-nom");
   }
 
   return { profile, user };

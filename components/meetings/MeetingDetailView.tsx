@@ -405,21 +405,21 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
     <div className="space-y-8 animate-fade-in-up">
       {/* Bandeau d'alerte si réunion en direct */}
       {meeting.status === "live" && (
-        <Card className="bg-alert/10 border-alert text-alert p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <Card className="bg-[#E1F3E8] border border-[#187A4C] text-[#0F4D30] p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <Radio className="w-6 h-6 animate-pulse shrink-0" />
+            <Radio className="w-6 h-6 animate-pulse shrink-0 text-[#187A4C]" />
             <div>
-              <h2 className="font-display font-bold text-base text-alert">
+              <h2 className="font-display font-bold text-base text-[#0F4D30]">
                 {copy.meetings.detail.liveBannerTitle}
               </h2>
-              <p className="text-xs text-text-muted">
+              <p className="text-xs text-[#0F4D30]/80">
                 La séance se déroule en ce moment selon l’ordre du jour.
               </p>
             </div>
           </div>
           {isPlanner && (
             <Link href={`/reunions/${meeting.id}/direct`}>
-              <Button variant="danger" className="min-h-[42px] py-2 px-4 text-xs font-semibold">
+              <Button variant="green" className="min-h-[42px] py-2 px-4 text-xs font-semibold">
                 {copy.meetings.detail.joinLiveButton}
               </Button>
             </Link>
@@ -457,12 +457,12 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
       )}
 
       {/* En-tête de la réunion */}
-      <Card className="p-6 md:p-8 space-y-5">
+      <Card className="p-6 md:p-8 space-y-5 border-t-4 border-t-primary">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 flex-wrap">
             {meeting.status === "live" && <LiveMeetingBadge />}
             {meeting.is_improvised && <ImprovisedBadge />}
-            {meeting.status === "cancelled" && <Badge variant="alert">Annulée</Badge>}
+            {meeting.status === "cancelled" && <Badge variant="neutral">Annulée</Badge>}
             {meeting.status === "done" && <Badge variant="success">Terminée</Badge>}
             <Badge variant="primary">{copy.meetings.durationLabel(meeting.planned_minutes)}</Badge>
           </div>
@@ -512,7 +512,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
         {isPlanner && meeting.status === "planned" && (
           <div className="flex items-center justify-between gap-3 pt-3 border-t border-border">
             <Link href={`/reunions/${meeting.id}/direct`}>
-              <Button variant="primary">
+              <Button variant="green">
                 <Radio className="w-4 h-4 mr-1.5" />
                 <span>{copy.meetings.live.startMeetingButton}</span>
               </Button>
@@ -521,7 +521,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             <Button
               variant="ghost"
               onClick={() => setShowCancelModal(true)}
-              className="text-alert hover:bg-alert/10 text-xs"
+              className="text-primary hover:bg-surface-muted text-xs border border-primary/30 rounded-pill px-3 py-1"
             >
               {copy.meetings.detail.cancelMeetingButton}
             </Button>
@@ -541,7 +541,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
               onClick={() => handleRsvp("yes")}
               className={`py-2.5 px-3 rounded-pill text-xs font-semibold border transition-all touch-target-min flex items-center justify-center gap-1.5 ${
                 userRsvp === "yes"
-                  ? "bg-success text-white border-success shadow-1"
+                  ? "bg-[#187A4C] text-white border-[#187A4C] shadow-1"
                   : "bg-white text-text border-border hover:bg-surface-muted"
               }`}
             >
@@ -554,7 +554,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
               onClick={() => handleRsvp("maybe")}
               className={`py-2.5 px-3 rounded-pill text-xs font-semibold border transition-all touch-target-min flex items-center justify-center ${
                 userRsvp === "maybe"
-                  ? "bg-[#F7E7C4] text-[#232D6B] border-accent shadow-1"
+                  ? "bg-[#FFF3C4] text-[#232D6B] border-[#F2B705] shadow-1"
                   : "bg-white text-text border-border hover:bg-surface-muted"
               }`}
             >
@@ -566,7 +566,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
               onClick={() => handleRsvp("no")}
               className={`py-2.5 px-3 rounded-pill text-xs font-semibold border transition-all touch-target-min flex items-center justify-center ${
                 userRsvp === "no"
-                  ? "bg-alert text-white border-alert shadow-1"
+                  ? "bg-surface-muted text-text border-primary/40 shadow-1"
                   : "bg-white text-text border-border hover:bg-surface-muted"
               }`}
             >
@@ -586,7 +586,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             <div className="flex items-center gap-2 mt-1">
               <span
                 className={`text-xs font-bold tabular-nums ${
-                  isOverTime ? "text-alert" : "text-text-muted"
+                  isOverTime ? "text-primary" : "text-text-muted"
                 }`}
               >
                 {copy.meetings.detail.agendaTimeUsage(
@@ -595,9 +595,9 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 )}
               </span>
               {isOverTime && (
-                <span className="text-xs font-medium text-alert flex items-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5" />
-                  {copy.meetings.detail.agendaOverTimeWarning}
+                <span className="text-xs font-semibold text-primary bg-[#FFF3C4] border border-[#F2B705] px-2 py-0.5 rounded-pill flex items-center gap-1">
+                  <AlertTriangle className="w-3.5 h-3.5 text-primary" />
+                  <span>Dépassé</span>
                 </span>
               )}
             </div>
@@ -630,7 +630,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
         <div className="w-full h-2 rounded-pill bg-surface-muted overflow-hidden border border-border">
           <div
             className={`h-full rounded-pill transition-all duration-base ${
-              isOverTime ? "bg-alert" : "bg-primary"
+              isOverTime ? "bg-[#F2B705]" : "bg-[#187A4C]"
             }`}
             style={{
               width: `${Math.min(
@@ -775,7 +775,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     <Button
                       variant="ghost"
                       onClick={() => setRejectingItemId(item.id)}
-                      className="text-xs min-h-[36px] py-1 px-3 text-alert hover:bg-alert/10"
+                      className="text-xs min-h-[36px] py-1 px-3 text-primary hover:bg-surface-muted"
                     >
                       {copy.meetings.detail.rejectTopicButton}
                     </Button>
@@ -797,7 +797,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                     </span>
                   </div>
                   {item.reject_reason && (
-                    <p className="text-xs text-alert mt-1">
+                    <p className="text-xs text-text-muted mt-1">
                       Motif : {item.reject_reason}
                     </p>
                   )}
@@ -848,14 +848,14 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                       <span className="font-medium text-xs sm:text-sm text-text block truncate">
                         {p.full_name || p.email}
                       </span>
-                      <span className="text-[11px] text-text-muted">
-                        {p.role === "planner" ? "Planificateur" : "Membre"}
+                      <span className="text-[11px] text-text-muted block truncate">
+                        {p.poste?.label || (p.role === "planner" ? "Planificateur" : "Membre")}
                       </span>
                     </div>
 
                     <Badge
                       variant={
-                        rsvp === "yes" ? "success" : rsvp === "maybe" ? "accent" : rsvp === "no" ? "alert" : "neutral"
+                        rsvp === "yes" ? "success" : rsvp === "maybe" ? "accent" : "neutral"
                       }
                       className="text-[10px] shrink-0"
                     >
@@ -1041,7 +1041,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             role="dialog"
             aria-labelledby="reject-topic-title"
           >
-            <h3 id="reject-topic-title" className="font-display font-bold text-lg text-alert">
+            <h3 id="reject-topic-title" className="font-display font-bold text-lg text-primary">
               Refuser ce sujet
             </h3>
             <p className="text-xs text-text-muted">
@@ -1060,7 +1060,8 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
               </Button>
               <Button
                 type="button"
-                variant="danger"
+                variant="secondary"
+                className="border-2 border-primary text-primary font-bold"
                 onClick={handleRejectProposedTopic}
                 isLoading={isRejecting}
               >
@@ -1083,7 +1084,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
             role="dialog"
             aria-labelledby="cancel-meeting-title"
           >
-            <h3 id="cancel-meeting-title" className="font-display font-bold text-lg text-alert">
+            <h3 id="cancel-meeting-title" className="font-display font-bold text-lg text-primary">
               {copy.meetings.detail.cancelModalTitle}
             </h3>
 
@@ -1106,7 +1107,7 @@ export const MeetingDetailView: React.FC<MeetingDetailViewProps> = ({
                 <Button type="button" variant="secondary" onClick={() => setShowCancelModal(false)}>
                   Fermer
                 </Button>
-                <Button type="submit" variant="danger" isLoading={isCancelling}>
+                <Button type="submit" variant="secondary" className="border-2 border-primary text-primary font-bold" isLoading={isCancelling}>
                   {copy.meetings.detail.cancelConfirmButton}
                 </Button>
               </div>

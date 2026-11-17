@@ -75,7 +75,7 @@ export default function ConnexionPage() {
             {/* Message d'erreur éventuel */}
             {errorMessage && (
               <div
-                className="bg-alert/10 border border-alert/30 text-alert p-3 rounded-sm text-sm font-medium animate-fade-in-up"
+                className="bg-[#FFF3C4] border-[1.5px] border-primary text-primary p-3 rounded-sm text-sm font-semibold animate-fade-in-up"
                 role="alert"
               >
                 {errorMessage}

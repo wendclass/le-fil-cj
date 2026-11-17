@@ -162,10 +162,10 @@ export const MeetingForm: React.FC<MeetingFormProps> = ({ profile }) => {
         </div>
       </div>
 
-      <Card className="p-6 sm:p-8">
+      <Card className="p-6 sm:p-8 border-t-4 border-t-primary">
         {errorMessage && (
           <div
-            className="mb-6 p-4 rounded-sm bg-alert/10 border border-alert/30 text-alert text-sm font-medium animate-fade-in-up"
+            className="mb-6 p-4 rounded-sm bg-[#FFF3C4] border-[1.5px] border-primary text-primary text-sm font-semibold animate-fade-in-up"
             role="alert"
           >
             {errorMessage}

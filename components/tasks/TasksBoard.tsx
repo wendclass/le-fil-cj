@@ -273,7 +273,7 @@ export const TasksBoard: React.FC<TasksBoardProps> = ({
         key={task.id}
         draggable={canMove}
         onDragStart={(e) => handleDragStart(e, task.id, task.assignee_id)}
-        className={`p-4 rounded-md bg-white border border-border shadow-1 space-y-3 transition-all ${
+        className={`p-4 rounded-md bg-white border border-border border-t-4 border-t-[#F2B705] shadow-1 space-y-3 transition-all ${
           canMove ? "cursor-grab active:cursor-grabbing hover:border-primary/40 hover:-translate-y-0.5" : "cursor-default"
         }`}
       >
@@ -304,10 +304,17 @@ export const TasksBoard: React.FC<TasksBoardProps> = ({
 
         {/* Responsable & Actions rapides mobiles */}
         <div className="flex items-center justify-between gap-2 pt-1 text-xs text-text-muted">
-          <span className="truncate flex items-center gap-1 font-medium text-text">
-            <User className="w-3.5 h-3.5 shrink-0 text-primary" />
-            <span className="truncate">{assigneeName}</span>
-          </span>
+          <div className="flex flex-col min-w-0">
+            <span className="truncate flex items-center gap-1 font-medium text-text">
+              <User className="w-3.5 h-3.5 shrink-0 text-primary" />
+              <span className="truncate">{assigneeName}</span>
+            </span>
+            {task.assignee?.poste?.label && (
+              <span className="text-[11px] text-text-muted pl-4 truncate">
+                {task.assignee.poste.label}
+              </span>
+            )}
+          </div>
 
           {/* Boutons d'action rapides */}
           {canMove && (
@@ -560,7 +567,7 @@ export const TasksBoard: React.FC<TasksBoardProps> = ({
             </div>
 
             {createError && (
-              <div className="p-3 bg-alert/10 border border-alert/30 text-alert rounded-sm text-xs font-semibold">
+              <div className="p-3 bg-[#FFF3C4] border-[1.5px] border-primary text-primary rounded-sm text-xs font-semibold">
                 {createError}
               </div>
             )}
@@ -607,7 +614,7 @@ export const TasksBoard: React.FC<TasksBoardProps> = ({
                   >
                     {allProfiles.map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.full_name || p.email}
+                        {p.full_name || p.email}{p.poste?.label ? `, ${p.poste.label}` : ""}
                       </option>
                     ))}
                   </select>

@@ -18,10 +18,10 @@ export default async function SuiviPage() {
   const now24hAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
   const todayStr = new Date().toISOString().split("T")[0];
 
-  // 1. Tous les profils
+  // 1. Tous les profils avec leur poste
   const { data: profilesData } = await supabase
     .from("profiles")
-    .select("*")
+    .select("*, poste:postes(*)")
     .order("full_name", { ascending: true });
   const allProfiles = (profilesData as Profile[]) || [];
   const profileMap = new Map<string, Profile>();

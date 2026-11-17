@@ -20,6 +20,7 @@ import { Logo } from "@/components/ui/Logo";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { useToast } from "@/components/ui/Toast";
+import { createClient } from "@/lib/supabase/client";
 import { copy } from "@/lib/copy";
 
 function urlBase64ToUint8Array(base64String: string) {
@@ -57,6 +58,22 @@ export default function BienvenuePage() {
     const isStandalone =
       window.matchMedia("(display-mode: standalone)").matches ||
       (window.navigator as any).standalone;
+
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        supabase
+          .from("profiles")
+          .select("name_confirmed_at")
+          .eq("id", user.id)
+          .single()
+          .then(({ data }) => {
+            if (data && !data.name_confirmed_at) {
+              router.replace("/mon-nom?from=bienvenue");
+            }
+          });
+      }
+    });
 
     if (isIos && !isStandalone) {
       setIsIosNonStandalone(true);
@@ -294,7 +311,7 @@ export default function BienvenuePage() {
                   /* Refusé dans le navigateur */
                   <div className="p-4 rounded-md bg-surface-muted border border-border text-xs space-y-1">
                     <div className="flex items-center gap-2 text-text font-semibold">
-                      <AlertTriangle className="w-4 h-4 text-alert" />
+                      <AlertTriangle className="w-4 h-4 text-[#232D6B]" />
                       <span>Notifications non autorisées</span>
                     </div>
                     <p className="text-text-muted">

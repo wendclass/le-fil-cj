@@ -5,22 +5,30 @@
 @tailwind utilities;
 
 :root {
-  /* Couleurs (tirées du logo : bleu marine du C, rouge du J) */
-  --color-bg: #FBF7EF;               /* crème, fond de page */
-  --color-surface: #FFFFFF;          /* cartes, champs, zones de lecture */
-  --color-surface-muted: #F4EFE4;    /* zones secondaires */
+  /* Structure */
+  --color-bg: #FBF7EF;
+  --color-surface: #FFFFFF;
+  --color-surface-muted: #F4EFE4;
   --color-border: #E7E1D3;
   --color-text: #101437;
   --color-text-muted: #5A5F7D;
-  --color-primary: #232D6B;          /* bleu marine : structure, boutons principaux */
+
+  /* Bleu marine (logo) : structure et actions principales */
+  --color-primary: #232D6B;
   --color-primary-hover: #1A2255;
   --color-on-primary: #FFFFFF;
-  --color-alert: #E3141A;            /* rouge : retards, urgences, alertes */
-  --color-on-alert: #FFFFFF;
-  --color-accent: #D99A1E;           /* ocre : touche panafricaine, avertissements doux */
-  --color-on-accent: #232D6B;        /* l'ocre ne porte jamais de texte blanc */
-  --color-success: #187A4C;
-  --color-on-success: #FFFFFF;
+
+  /* Jaune soleil : attention, échéances, énergie */
+  --color-yellow: #F2B705;
+  --color-on-yellow: #232D6B;          /* le jaune porte toujours du texte bleu marine */
+  --color-yellow-soft: #FFF3C4;        /* fond clair, texte bleu marine */
+
+  /* Vert : réussite, validation, direct */
+  --color-green: #187A4C;              /* texte blanc dessus */
+  --color-on-green: #FFFFFF;
+  --color-green-bright: #2DB36B;       /* grandes surfaces décoratives, texte bleu marine dessus */
+  --color-green-soft: #E1F3E8;         /* fond clair, texte #0F4D30 */
+  --color-green-ink: #0F4D30;
 
   /* Typographie avec polices de secours déclarées */
   --font-display: "Sora", "Inter", system-ui, sans-serif;

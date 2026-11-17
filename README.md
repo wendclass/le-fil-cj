@@ -103,6 +103,24 @@ Les migrations doivent être exécutées dans l’ordre chronologique strict dan
    - Protection stricte du dernier planificateur (`check_planner_safety`).
    - Débit limite des tests push (maximum 5 par heure par utilisateur).
    - RLS stricte sur les points et badges personnels.
+5. `supabase/migrations/20261117_correction_a_postes_names_palette.sql` (Correction A) :
+   - Table `postes` (`id`, `label` unique, `rank`, `created_at`) et politiques RLS associées (lecture pour tous, écriture réservée aux planificateurs).
+   - Ajout des colonnes `first_name`, `last_name`, `name_confirmed_at` et `poste_id` dans `profiles` et `invitations`.
+   - Déclencheur `sync_profile_full_name()` assurant la synchronisation automatique de `full_name` = « Prénom Nom ».
+   - Fonction `confirm_my_name(first_name, last_name)` sécurisée (`security definer`) pour la saisie et confirmation du nom par l'utilisateur connecté.
+   - Mise à jour de `claim_invitation()` pour préremplir le prénom, le nom et le poste attribué lors de l'invitation.
+
+---
+
+## 4. bis Vérification de conformité visuelle (Zéro Rouge)
+
+Pour s’assurer que l’interface respecte strictement la nouvelle charte graphique sans aucun rouge, rose ou orange :
+
+```bash
+npm run check:no-red
+```
+
+Ce script analyse l'ensemble des fichiers dans `app/`, `components/` et `lib/` et échoue avec un code d'erreur non nul si le moindre token obsolète ou code couleur bordeaux/rouge/orange est détecté.
 
 ---
 
