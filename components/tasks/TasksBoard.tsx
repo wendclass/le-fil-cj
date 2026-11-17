@@ -200,6 +200,21 @@ export const TasksBoard: React.FC<TasksBoardProps> = ({
       const assigneeProfile = allProfiles.find((p) => p.id === selectedAssignee);
       const newTask = { ...(data as Task), assignee: assigneeProfile };
 
+      // Notification instantanée pour le responsable
+      fetch("/api/notifications/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "task_assigned",
+          data: {
+            id: data.id,
+            title: data.title,
+            assigneeId: data.assignee_id,
+            dueDateStr: formatOuagaDate(data.due_date),
+          },
+        }),
+      }).catch((err) => console.warn("Erreur broadcast task :", err));
+
       setTasks((prev) => [newTask, ...prev]);
       setShowCreateModal(false);
       setTaskTitle("");

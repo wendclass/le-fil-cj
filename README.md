@@ -31,6 +31,11 @@ cp .env.example .env.local
 | `SUPABASE_SERVICE_ROLE_KEY` | **Secrète (Serveur & Amorçage)** | Clé de service Supabase (accès administrateur pour l'amorçage initial) |
 | `NEXT_PUBLIC_SITE_URL` | Publique (Client & Serveur) | URL publique du site (ex: `http://localhost:3000` ou `https://le-fil-cj.vercel.app`) |
 | `INITIAL_PLANNER_EMAILS` | Secrète (Script d’amorçage) | Deux adresses Google des planificateurs séparées par une virgule |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Publique (Client & Serveur) | Clé publique VAPID pour l'inscription push du navigateur |
+| `VAPID_PUBLIC_KEY` | Serveur uniquement | Clé publique VAPID pour l'envoi de notifications Web Push |
+| `VAPID_PRIVATE_KEY` | **Secrète (Serveur uniquement)** | Clé privée VAPID pour signer les requêtes Web Push |
+| `VAPID_SUBJECT` | Serveur uniquement | Adresse de contact du club (`mailto:contact@club-cj.org`) |
+| `CRON_SECRET` | Secrète (Serveur & Cron) | Clé secrète autorisant l'exécution périodique de `/api/cron/reminders` |
 
 > [!CAUTION]
 > Ne jamais exposer `SUPABASE_SERVICE_ROLE_KEY` dans le code client ou sur le navigateur. Cette variable n'est utilisée que par le script d'amorçage sécurisé `scripts/seed-planners.ts`.
@@ -64,7 +69,8 @@ cp .env.example .env.local
 
 1. Exécuter les migrations SQL situées dans :
    - `supabase/migrations/20261117_init_schema.sql` (schéma initial, tables, fonctions de base et RLS)
-   - `supabase/migrations/20261117_phase2_core_flow.sql` (fonctions d'approbation de priorité, publication de décisions, calculs d'échéances et déclencheurs de réunions)
+   - `supabase/migrations/20261117_phase2_core_flow.sql` (fonctions d'approbation de priorité, publication de décisions, calculs d'échéances et mode direct)
+   - `supabase/migrations/20261117_phase3_tracking_metrics.sql` (attribution de points, déblocage des badges, accusés de lecture et calcul des 5 indicateurs du club)
    directement dans le **SQL Editor** de Supabase ou via le Supabase CLI.
 2. Cette migration :
    - Crée tous les types ENUM et l'ensemble des 16 tables.

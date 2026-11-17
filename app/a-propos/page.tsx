@@ -33,6 +33,17 @@ export default async function AProposPage() {
               <p className="font-body text-base text-text leading-relaxed">
                 {copy.about.body}
               </p>
+              <div className="p-3.5 rounded-md bg-surface-muted border border-border text-xs text-text space-y-1">
+                <span className="font-bold text-primary block">
+                  Confidentialité et vie privée :
+                </span>
+                <p className="text-text-muted leading-relaxed">
+                  {copy.about.pushPolicy}
+                </p>
+                <p className="text-text-muted leading-relaxed">
+                  Tes notifications et tes points sont strictement personnels. Aucun profil public, aucun classement public (« leaderboard »).
+                </p>
+              </div>
               <p className="text-xs text-text-muted">
                 {copy.about.clubDetails}
               </p>

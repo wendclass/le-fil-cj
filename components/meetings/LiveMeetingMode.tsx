@@ -228,6 +228,20 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
 
       setMeeting(data as Meeting);
       setItemStartTime(Date.now());
+
+      // Notification en direct pour tous les membres
+      fetch("/api/notifications/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "meeting_live",
+          data: {
+            id: meeting.id,
+            title: meeting.title,
+          },
+        }),
+      }).catch((err) => console.warn("Erreur broadcast live :", err));
+
       showToast("La réunion est en direct !", "success");
     } catch {
       showToast(copy.app.errorGeneric, "error");
@@ -483,6 +497,20 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
         setIsPublishing(false);
         return;
       }
+
+      // Notification de publication des décisions
+      fetch("/api/notifications/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "decisions_published",
+          data: {
+            id: meeting.id,
+            title: meeting.title,
+            count: data?.published_count || decisions.length,
+          },
+        }),
+      }).catch((err) => console.warn("Erreur broadcast decisions :", err));
 
       showToast("Décisions publiées avec succès !", "success");
       router.push(`/reunions/${meeting.id}`);

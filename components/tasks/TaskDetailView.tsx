@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Target,
   FileCheck2,
+  Eye,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -21,7 +22,7 @@ import { DueDateBadge } from "@/components/ui/DueDateBadge";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
 import { copy } from "@/lib/copy";
-import { formatOuagaDate } from "@/lib/date";
+import { formatOuagaDate, formatOuagaDateTime } from "@/lib/date";
 import type { Profile, Task, Decision, Priority, task_status_type } from "@/types/database";
 
 interface TaskDetailViewProps {
@@ -30,6 +31,7 @@ interface TaskDetailViewProps {
   assignee: Profile | null;
   decision: Decision | null;
   priority: Priority | null;
+  assigneeReadAt?: string | null;
 }
 
 export const TaskDetailView: React.FC<TaskDetailViewProps> = ({
@@ -38,6 +40,7 @@ export const TaskDetailView: React.FC<TaskDetailViewProps> = ({
   assignee,
   decision,
   priority,
+  assigneeReadAt = null,
 }) => {
   const { showToast } = useToast();
   const isPlanner = profile.role === "planner";
@@ -159,6 +162,24 @@ export const TaskDetailView: React.FC<TaskDetailViewProps> = ({
               {formatOuagaDate(task.due_date)}
             </span>
           </div>
+
+          {isPlanner && (
+            <div className="flex items-center justify-between py-1.5 border-b border-border/60">
+              <span className="text-text-muted flex items-center gap-1.5">
+                <Eye className="w-4 h-4 text-primary" />
+                Lecture par le responsable
+              </span>
+              <span
+                className={`font-semibold text-xs ${
+                  assigneeReadAt ? "text-text" : "text-alert"
+                }`}
+              >
+                {assigneeReadAt
+                  ? `Vu par ${assignee?.full_name?.split(" ")[0] || "le responsable"} le ${formatOuagaDateTime(assigneeReadAt)}`
+                  : "Pas encore ouvert"}
+              </span>
+            </div>
+          )}
 
           {task.completed_at && (
             <div className="flex items-center justify-between py-1.5 border-b border-border/60">

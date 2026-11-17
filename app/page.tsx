@@ -124,6 +124,56 @@ export default async function HomePage() {
 
   const myTasks = (myTasksData as Task[]) || [];
 
+  // 7. Mini-indicateurs
+  const { data: metricsData } = await supabase.rpc("get_club_metrics", {
+    p_period: "current_month",
+  });
+
+  // 8. Éléments à surveiller pour le planificateur
+  let plannerWatchlist = {
+    unseenCount: 0,
+    overdueCount: 0,
+    draftDecisionsCount: 0,
+  };
+
+  if (profile.role === "planner") {
+    const todayStr = new Date().toISOString().split("T")[0];
+    const now24hAgo = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+
+    const { count: overdueCount } = await supabase
+      .from("tasks")
+      .select("id", { count: "exact", head: true })
+      .neq("status", "done")
+      .lt("due_date", todayStr);
+
+    const { count: draftsCount } = await supabase
+      .from("decisions")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "draft");
+
+    const { data: reads } = await supabase
+      .from("reads")
+      .select("entity_id, user_id, entity_type");
+    const { data: olderTasks } = await supabase
+      .from("tasks")
+      .select("id, assignee_id")
+      .neq("status", "done")
+      .lte("created_at", now24hAgo);
+
+    const readSet = new Set(
+      (reads || []).map((r) => `${r.entity_type}:${r.entity_id}:${r.user_id}`)
+    );
+    const unseenTasks = (olderTasks || []).filter(
+      (t) => !readSet.has(`task:${t.id}:${t.assignee_id}`)
+    ).length;
+
+    plannerWatchlist = {
+      unseenCount: unseenTasks,
+      overdueCount: overdueCount || 0,
+      draftDecisionsCount: draftsCount || 0,
+    };
+  }
+
   return (
     <AppShell profile={profile}>
       <HomeDashboard
@@ -135,6 +185,8 @@ export default async function HomePage() {
         initialDecisionsToValidate={decisionsToValidate}
         initialMyTasks={myTasks}
         unvalidatedDecisionsCount={unvalidatedDecisionsCount}
+        miniMetrics={metricsData}
+        plannerWatchlist={plannerWatchlist}
       />
     </AppShell>
   );

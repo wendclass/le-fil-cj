@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bell, User as UserIcon } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
+import { createClient } from "@/lib/supabase/client";
 import { copy } from "@/lib/copy";
 import type { Profile } from "@/types/database";
 
@@ -13,7 +14,52 @@ interface AppHeaderProps {
 }
 
 export const AppHeader: React.FC<AppHeaderProps> = ({ profile }) => {
-  const [avatarError, setAvatarError] = React.useState(false);
+  const [avatarError, setAvatarError] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  useEffect(() => {
+    if (!profile?.id) return;
+
+    const supabase = createClient();
+
+    // Récupérer le nombre initial de notifications non lues
+    supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", profile.id)
+      .is("read_at", null)
+      .then(({ count }) => {
+        if (typeof count === "number") setUnreadCount(count);
+      });
+
+    // Écouter les nouvelles notifications en temps réel
+    const channel = supabase
+      .channel(`user-notifications-${profile.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "notifications",
+          filter: `user_id=eq.${profile.id}`,
+        },
+        () => {
+          supabase
+            .from("notifications")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", profile.id)
+            .is("read_at", null)
+            .then(({ count }) => {
+              if (typeof count === "number") setUnreadCount(count);
+            });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [profile?.id]);
 
   const initials = profile?.full_name
     ? profile.full_name
@@ -40,19 +86,26 @@ export const AppHeader: React.FC<AppHeaderProps> = ({ profile }) => {
           </Link>
         </div>
 
-        {/* Actions utilisateur : cloche inactive + profil */}
+        {/* Actions utilisateur : cloche active + profil */}
         <div className="flex items-center gap-2 md:gap-3">
-          {/* Cloche de notifications (inactive en Phase 1) */}
+          {/* Cloche de notifications active */}
           <div className="relative">
-            <button
-              type="button"
-              disabled
-              title="Notifications (bientôt disponible en Phase 3)"
-              aria-label="Notifications (bientôt disponible)"
-              className="relative p-2.5 rounded-full text-text-muted hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary opacity-60 cursor-not-allowed touch-target-min flex items-center justify-center"
+            <Link
+              href="/notifications"
+              title="Centre de notifications"
+              aria-label="Centre de notifications"
+              className="relative p-2.5 rounded-full text-text-muted hover:text-primary hover:bg-surface-muted transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary touch-target-min flex items-center justify-center"
             >
               <Bell className="w-5 h-5" />
-            </button>
+              {unreadCount > 0 && (
+                <span
+                  className="absolute top-1.5 right-1.5 min-w-[18px] h-[18px] px-1 bg-alert text-white rounded-full text-[10px] font-bold flex items-center justify-center pointer-events-none"
+                  aria-label={`${unreadCount} notification${unreadCount > 1 ? "s" : ""} non lue${unreadCount > 1 ? "s" : ""}`}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
           </div>
 
           {/* Avatar utilisateur */}

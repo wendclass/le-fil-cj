@@ -14,6 +14,8 @@ import {
   Users,
   ArrowLeft,
   ExternalLink,
+  Eye,
+  ChevronDown,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -23,7 +25,7 @@ import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
 import { copy } from "@/lib/copy";
 import { formatOuagaDate, formatOuagaDateTime, formatValidationRemaining } from "@/lib/date";
-import type { Profile, Decision, Task, DecisionValidation, Meeting } from "@/types/database";
+import type { Profile, Decision, Task, DecisionValidation, Meeting, ReadReceipt } from "@/types/database";
 
 interface DecisionDetailViewProps {
   profile: Profile;
@@ -32,6 +34,7 @@ interface DecisionDetailViewProps {
   tasks: Task[];
   validations: DecisionValidation[];
   allProfiles: Profile[];
+  readReceipts?: ReadReceipt[];
 }
 
 export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
@@ -41,6 +44,7 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
   tasks,
   validations,
   allProfiles,
+  readReceipts = [],
 }) => {
   const { showToast } = useToast();
   const isPlanner = profile.role === "planner";
@@ -49,6 +53,14 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
   const [localValidations, setLocalValidations] = useState<DecisionValidation[]>(validations);
   const [isValidating, setIsValidating] = useState(false);
   const [validatedSuccess, setValidatedSuccess] = useState(false);
+  const [showReadDetails, setShowReadDetails] = useState(false);
+
+  // Accusés de lecture
+  const readMap = new Map<string, string>();
+  readReceipts.forEach((r) => {
+    readMap.set(r.user_id, r.first_read_at);
+  });
+  const readers = allProfiles.filter((p) => readMap.has(p.id));
 
   // Vérifier si l'utilisateur connecté a déjà validé
   const myValidation = localValidations.find((v) => v.user_id === profile.id);
@@ -237,14 +249,68 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
         </section>
       )}
 
-      {/* Suivi nominatif des validations pour les PLANIFICATEURS */}
+      {/* Suivi nominatif des validations et lectures pour les PLANIFICATEURS */}
       {isPlanner && (
-        <section className="space-y-4 pt-4 border-t border-border">
-          <h2 className="font-display font-bold text-xl text-primary">
-            Suivi des validations des membres ({localValidations.length}/{allProfiles.length})
-          </h2>
+        <section className="space-y-6 pt-4 border-t border-border">
+          {/* Bloc Accusés de lecture */}
+          <Card className="p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Eye className="w-5 h-5 text-primary" />
+                <h3 className="font-display font-bold text-sm text-primary">
+                  Lu par {readers.length}/{allProfiles.length} membres
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowReadDetails((prev) => !prev)}
+                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+              >
+                <span>{showReadDetails ? "Masquer la liste" : "Voir les détails"}</span>
+                <ChevronDown
+                  className={`w-4 h-4 transition-transform duration-200 ${
+                    showReadDetails ? "rotate-180" : ""
+                  }`}
+                />
+              </button>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {showReadDetails && (
+              <div className="pt-2 border-t border-border/60 space-y-2">
+                {readers.length === 0 ? (
+                  <p className="text-xs text-text-muted italic py-1">
+                    Aucun membre n’a encore ouvert cette décision.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {readers.map((p) => {
+                      const readAt = readMap.get(p.id);
+                      return (
+                        <div
+                          key={p.id}
+                          className="p-2.5 rounded-md bg-surface-muted border border-border flex items-center justify-between text-xs"
+                        >
+                          <span className="font-medium text-text">
+                            {p.full_name || p.email}
+                          </span>
+                          <span className="text-[11px] text-text-muted">
+                            {readAt ? formatOuagaDateTime(readAt) : "—"}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+
+          <div className="space-y-4">
+            <h2 className="font-display font-bold text-xl text-primary">
+              Suivi des validations des membres ({localValidations.length}/{allProfiles.length})
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Ont validé */}
             <Card className="p-5 space-y-3">
               <h3 className="font-display font-bold text-sm text-success flex items-center gap-1.5">
@@ -297,8 +363,9 @@ export const DecisionDetailView: React.FC<DecisionDetailViewProps> = ({
               )}
             </Card>
           </div>
-        </section>
-      )}
+        </div>
+      </section>
+    )}
     </div>
   );
 };

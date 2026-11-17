@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/Input";
 import { useToast } from "@/components/ui/Toast";
 import { createClient } from "@/lib/supabase/client";
 import { copy } from "@/lib/copy";
+import { formatOuagaDateTime } from "@/lib/date";
 import type { Profile } from "@/types/database";
 
 interface MeetingFormProps {
@@ -74,6 +75,20 @@ export const MeetingForm: React.FC<MeetingFormProps> = ({ profile }) => {
         setIsSubmitting(false);
         return;
       }
+
+      // Notification instantanée de convocation
+      fetch("/api/notifications/broadcast", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          event: "meeting_created",
+          data: {
+            id: data.id,
+            title: data.title,
+            dateTimeStr: formatOuagaDateTime(data.starts_at),
+          },
+        }),
+      }).catch((err) => console.warn("Erreur broadcast notification :", err));
 
       showToast("Réunion planifiée avec succès.", "success");
       router.push(`/reunions/${data.id}?created=true`);

@@ -2,6 +2,7 @@ import { requireAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/AppShell";
 import { MeetingDetailView } from "@/components/meetings/MeetingDetailView";
+import { MarkAsRead } from "@/components/tracking/MarkAsRead";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -73,6 +74,11 @@ export default async function ReunionDetailPage({ params, searchParams }: PagePr
 
   return (
     <AppShell profile={profile}>
+      <MarkAsRead
+        entityType="meeting"
+        entityId={meetingData.id}
+        userId={profile.id}
+      />
       <MeetingDetailView
         profile={profile}
         initialMeeting={meetingData as Meeting}

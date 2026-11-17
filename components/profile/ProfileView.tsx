@@ -3,24 +3,98 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { LogOut, Shield, User, Mail, HelpCircle, X, ExternalLink } from "lucide-react";
+import {
+  LogOut,
+  Shield,
+  User,
+  Mail,
+  HelpCircle,
+  X,
+  ExternalLink,
+  Flame,
+  Award,
+  Sparkles,
+  Zap,
+  BookOpen,
+  Mic,
+  CalendarCheck,
+  CheckCircle2,
+  Lock,
+  Clock,
+} from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { createClient } from "@/lib/supabase/client";
 import { copy } from "@/lib/copy";
-import { formatOuagaDate } from "@/lib/date";
-import type { Profile } from "@/types/database";
+import { formatOuagaDate, formatOuagaDateTime } from "@/lib/date";
+import type { Profile, UserBadge, PointsLog, BadgeKey } from "@/types/database";
 
 interface ProfileViewProps {
   profile: Profile;
   planners: Profile[];
+  userBadges: UserBadge[];
+  pointsLog: PointsLog[];
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ profile, planners }) => {
+interface BadgeConfig {
+  key: BadgeKey;
+  title: string;
+  description: string;
+  icon: React.FC<{ className?: string }>;
+}
+
+const BADGES_CONFIG: BadgeConfig[] = [
+  {
+    key: "first_task",
+    title: copy.gamification.badges.first_task.title,
+    description: copy.gamification.badges.first_task.description,
+    icon: CheckCircle2,
+  },
+  {
+    key: "five_on_time",
+    title: copy.gamification.badges.five_on_time.title,
+    description: copy.gamification.badges.five_on_time.description,
+    icon: Zap,
+  },
+  {
+    key: "series_ten",
+    title: copy.gamification.badges.series_ten.title,
+    description: copy.gamification.badges.series_ten.description,
+    icon: Flame,
+  },
+  {
+    key: "assiduous_reader",
+    title: copy.gamification.badges.assiduous_reader.title,
+    description: copy.gamification.badges.assiduous_reader.description,
+    icon: BookOpen,
+  },
+  {
+    key: "club_voice",
+    title: copy.gamification.badges.club_voice.title,
+    description: copy.gamification.badges.club_voice.description,
+    icon: Mic,
+  },
+  {
+    key: "always_there",
+    title: copy.gamification.badges.always_there.title,
+    description: copy.gamification.badges.always_there.description,
+    icon: CalendarCheck,
+  },
+];
+
+export const ProfileView: React.FC<ProfileViewProps> = ({
+  profile,
+  planners,
+  userBadges = [],
+  pointsLog = [],
+}) => {
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showSupportModal, setShowSupportModal] = useState(false);
+
+  const earnedMap = new Map<string, string>();
+  userBadges.forEach((b) => earnedMap.set(b.badge_key, b.earned_at));
 
   const initials = profile.full_name
     ? profile.full_name
@@ -43,7 +117,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, planners }) =
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6 animate-fade-in-up">
+    <div className="max-w-3xl mx-auto space-y-8 animate-fade-in-up">
+      {/* En-tête */}
       <div>
         <h1 className="font-display font-extrabold text-2xl sm:text-3xl text-primary tracking-tight">
           {copy.profile.title}
@@ -53,8 +128,8 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, planners }) =
         </p>
       </div>
 
-      <Card className="p-6 sm:p-8 space-y-8">
-        {/* En-tête profil avec grand avatar */}
+      {/* Profil & Badges de base */}
+      <Card className="p-6 sm:p-8 space-y-6">
         <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 text-center sm:text-left">
           <div className="w-20 h-20 rounded-full overflow-hidden bg-primary/10 text-primary flex items-center justify-center font-display font-bold text-2xl border-2 border-border shadow-1 shrink-0">
             {profile.avatar_url ? (
@@ -94,74 +169,243 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, planners }) =
         </div>
 
         {/* Détails du compte */}
-        <div className="border-t border-border pt-6 space-y-4">
-          <div className="flex items-center justify-between text-sm py-2 border-b border-border/60">
+        <div className="border-t border-border pt-4 space-y-3 text-sm">
+          <div className="flex items-center justify-between py-1.5 border-b border-border/60">
             <span className="text-text-muted">{copy.profile.emailLabel}</span>
             <span className="font-medium text-text">{profile.email}</span>
           </div>
-          <div className="flex items-center justify-between text-sm py-2 border-b border-border/60">
+          <div className="flex items-center justify-between py-1.5 border-b border-border/60">
             <span className="text-text-muted">{copy.profile.roleLabel}</span>
             <span className="font-medium text-text">
               {profile.role === "planner" ? copy.roles.planner : copy.roles.member}
             </span>
           </div>
-          <div className="flex items-center justify-between text-sm py-2 border-b border-border/60">
+          <div className="flex items-center justify-between py-1.5 border-b border-border/60">
             <span className="text-text-muted">{copy.profile.joinedLabel}</span>
             <span className="font-medium text-text tabular-nums">
               {formatOuagaDate(profile.created_at)}
             </span>
           </div>
         </div>
-
-        {/* Lien de contact des planificateurs */}
-        <div className="pt-2">
-          <button
-            type="button"
-            onClick={() => setShowSupportModal(true)}
-            className="inline-flex items-center gap-2 text-sm text-primary hover:underline font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-pill px-2 py-1"
-          >
-            <HelpCircle className="w-4 h-4 text-accent" />
-            <span>{copy.profile.supportText}</span>
-          </button>
-        </div>
-
-        {/* Bouton de déconnexion */}
-        <div className="border-t border-border pt-6">
-          <Button
-            variant="danger"
-            onClick={handleLogout}
-            isLoading={isLoggingOut}
-            className="w-full sm:w-auto"
-          >
-            <LogOut className="w-4 h-4 mr-1.5" />
-            <span>{isLoggingOut ? copy.profile.loggingOut : copy.profile.logoutButton}</span>
-          </Button>
-        </div>
       </Card>
 
-      {/* Modal / Feuille de contact des planificateurs */}
+      {/* Ludification discrète : Points personnels et Séries */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-accent" />
+            <h2 className="font-display font-bold text-lg text-primary">
+              {copy.gamification.pointsLabel}
+            </h2>
+          </div>
+          <span className="text-xs text-text-muted italic">
+            Strictement personnel
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          {/* Total des points */}
+          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-l-4 border-l-accent shadow-1">
+            <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+              Score personnel
+            </span>
+            <div className="flex items-baseline gap-1 font-display font-extrabold text-3xl sm:text-4xl text-primary">
+              <span>{profile.points || 0}</span>
+              <span className="text-sm font-bold text-text-muted">points</span>
+            </div>
+            <p className="text-[11px] text-text-muted">
+              Gagnés par ponctualité et assiduité
+            </p>
+          </Card>
+
+          {/* Série en cours */}
+          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-l-4 border-l-primary shadow-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                {copy.gamification.streakLabel}
+              </span>
+              <Flame className="w-4 h-4 text-alert" />
+            </div>
+            <div className="flex items-baseline gap-1 font-display font-extrabold text-3xl sm:text-4xl text-primary">
+              <span>{profile.streak || 0}</span>
+              <span className="text-xs font-bold text-text-muted">à l’heure</span>
+            </div>
+            <p className="text-[11px] text-text-muted">
+              Tâches consécutives livrées à temps
+            </p>
+          </Card>
+
+          {/* Record personnel */}
+          <Card className="p-5 flex flex-col justify-between space-y-3 bg-white border-l-4 border-l-success shadow-1">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                {copy.gamification.bestStreakLabel}
+              </span>
+              <Award className="w-4 h-4 text-success" />
+            </div>
+            <div className="flex items-baseline gap-1 font-display font-extrabold text-3xl sm:text-4xl text-primary">
+              <span>{profile.best_streak || 0}</span>
+              <span className="text-xs font-bold text-text-muted">record</span>
+            </div>
+            <p className="text-[11px] text-text-muted">
+              Meilleure régularité atteinte
+            </p>
+          </Card>
+        </div>
+      </section>
+
+      {/* Badges de réussite (6 médaillons circulaires) */}
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Award className="w-5 h-5 text-primary" />
+            <h2 className="font-display font-bold text-lg text-primary">
+              {copy.gamification.badgesTitle}
+            </h2>
+          </div>
+          <Badge variant={userBadges.length > 0 ? "success" : "neutral"}>
+            {copy.gamification.badgesEarnedCount(userBadges.length, BADGES_CONFIG.length)}
+          </Badge>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {BADGES_CONFIG.map((badge) => {
+            const earnedAt = earnedMap.get(badge.key);
+            const isEarned = Boolean(earnedAt);
+            const Icon = badge.icon;
+
+            return (
+              <Card
+                key={badge.key}
+                className={`p-4 flex flex-col items-center text-center space-y-3 transition-all ${
+                  isEarned
+                    ? "bg-white border-primary/40 shadow-1 hover:border-primary"
+                    : "bg-surface-muted/60 border-dashed border-border text-text-muted opacity-80"
+                }`}
+              >
+                {/* Médaillon circulaire (bleu marine et ocre) */}
+                <div
+                  className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+                    isEarned
+                      ? "bg-[#232D6B] text-[#D4A017] shadow-md ring-4 ring-[#F7E7C4]/60 animate-badge-celebrate"
+                      : "bg-border/60 text-text-muted ring-2 ring-transparent"
+                  }`}
+                  style={{
+                    animationDuration: "600ms",
+                  }}
+                >
+                  {isEarned ? (
+                    <Icon className="w-7 h-7" />
+                  ) : (
+                    <Lock className="w-5 h-5 text-text-muted" />
+                  )}
+                </div>
+
+                {/* Nom et condition */}
+                <div className="space-y-1">
+                  <h3
+                    className={`font-display font-bold text-sm ${
+                      isEarned ? "text-primary" : "text-text-muted"
+                    }`}
+                  >
+                    {badge.title}
+                  </h3>
+                  <p className="text-[11px] text-text-muted leading-tight">
+                    {badge.description}
+                  </p>
+                </div>
+
+                {/* Statut d'obtention */}
+                <div className="pt-1 mt-auto">
+                  {isEarned ? (
+                    <span className="text-[10px] font-semibold text-success flex items-center gap-1">
+                      <CheckCircle2 className="w-3 h-3" />
+                      <span>{copy.gamification.badgeEarnedDate(formatOuagaDate(earnedAt!))}</span>
+                    </span>
+                  ) : (
+                    <span className="text-[10px] text-text-muted">
+                      {copy.gamification.badgeLockedHint}
+                    </span>
+                  )}
+                </div>
+              </Card>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Historique des 10 derniers gains de points */}
+      <section className="space-y-3">
+        <h2 className="font-display font-bold text-base text-primary">
+          {copy.gamification.historyTitle}
+        </h2>
+
+        {pointsLog.length === 0 ? (
+          <Card className="p-6 text-center text-xs text-text-muted italic bg-surface-muted">
+            {copy.gamification.noHistory}
+          </Card>
+        ) : (
+          <Card className="divide-y divide-border/60 overflow-hidden">
+            {pointsLog.map((log) => (
+              <div
+                key={log.id}
+                className="p-3.5 flex items-center justify-between gap-3 text-xs"
+              >
+                <div className="space-y-0.5">
+                  <span className="font-medium text-text block">
+                    {log.reason}
+                  </span>
+                  <span className="text-[11px] text-text-muted tabular-nums">
+                    {formatOuagaDateTime(log.created_at)}
+                  </span>
+                </div>
+                <span className="font-bold text-xs px-2 py-0.5 rounded-full bg-success/15 text-success shrink-0">
+                  +{log.delta} pts
+                </span>
+              </div>
+            ))}
+          </Card>
+        )}
+      </section>
+
+      {/* Actions bas de page */}
+      <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border">
+        <Button
+          variant="secondary"
+          onClick={() => setShowSupportModal(true)}
+          className="text-xs w-full sm:w-auto"
+        >
+          <HelpCircle className="w-4 h-4 mr-1.5 text-primary" />
+          <span>{copy.profile.supportText}</span>
+        </Button>
+
+        <Button
+          variant="ghost"
+          onClick={handleLogout}
+          isLoading={isLoggingOut}
+          className="text-xs text-alert hover:bg-alert/10 w-full sm:w-auto"
+        >
+          <LogOut className="w-4 h-4 mr-1.5" />
+          <span>{copy.profile.logoutButton}</span>
+        </Button>
+      </div>
+
+      {/* Modale d'aide & contact des planificateurs */}
       {showSupportModal && (
         <div
-          className="fixed inset-0 z-50 bg-black/40 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in-up"
-          onClick={() => setShowSupportModal(false)}
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm animate-fade-in"
+          role="dialog"
+          aria-modal="true"
         >
-          <div
-            className="bg-white rounded-lg border border-border shadow-2 max-w-md w-full p-6 space-y-5"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-labelledby="modal-support-title"
-          >
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <h3
-                id="modal-support-title"
-                className="font-display font-bold text-lg text-primary"
-              >
+          <Card className="w-full max-w-md p-6 space-y-5 animate-scale-up shadow-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display font-bold text-lg text-primary">
                 {copy.profile.supportModalTitle}
               </h3>
               <button
                 type="button"
                 onClick={() => setShowSupportModal(false)}
-                className="p-1.5 rounded-full text-text-muted hover:text-text touch-target-min"
+                className="p-1 rounded-full text-text-muted hover:text-text hover:bg-surface-muted"
                 aria-label="Fermer"
               >
                 <X className="w-5 h-5" />
@@ -169,51 +413,48 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ profile, planners }) =
             </div>
 
             <p className="text-sm text-text-muted leading-relaxed">
-              {copy.profile.supportModalDescription}
+              Pour toute question sur tes tâches, ton rôle ou les décisions du club, contacte directement un planificateur :
             </p>
 
             <div className="space-y-3">
               {planners.length === 0 ? (
                 <p className="text-xs text-text-muted italic">
-                  Aucun planificateur listé pour le moment.
+                  Aucun planificateur enregistré pour le moment.
                 </p>
               ) : (
                 planners.map((p) => (
                   <div
                     key={p.id}
-                    className="p-3.5 rounded-md bg-surface-muted border border-border flex items-center justify-between gap-3"
+                    className="p-3 rounded-md bg-surface-muted border border-border flex items-center justify-between text-xs"
                   >
-                    <div>
-                      <div className="font-display font-semibold text-sm text-text">
+                    <div className="space-y-0.5">
+                      <span className="font-semibold text-text block">
                         {p.full_name || "Planificateur"}
-                      </div>
-                      <div className="text-xs text-text-muted flex items-center gap-1 mt-0.5">
-                        <Mail className="w-3.5 h-3.5" />
-                        <span>{p.email}</span>
-                      </div>
+                      </span>
+                      <span className="text-text-muted">{p.email}</span>
                     </div>
                     <a
-                      href={`mailto:${p.email}?subject=Question%20Le%20Fil%20Club%20CJ`}
-                      className="p-2 rounded-pill bg-white border border-border text-primary hover:bg-primary hover:text-white transition-colors"
-                      title={`Écrire à ${p.email}`}
+                      href={`mailto:${p.email}`}
+                      className="p-2 rounded-full hover:bg-white text-primary transition-colors"
+                      title="Envoyer un e-mail"
                     >
-                      <ExternalLink className="w-4 h-4" />
+                      <Mail className="w-4 h-4" />
                     </a>
                   </div>
                 ))
               )}
             </div>
 
-            <div className="pt-2">
+            <div className="pt-2 text-right">
               <Button
                 variant="secondary"
                 onClick={() => setShowSupportModal(false)}
-                className="w-full text-sm"
+                className="text-xs"
               >
                 Fermer
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

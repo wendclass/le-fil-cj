@@ -2,6 +2,7 @@ import { requireAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/AppShell";
 import { TaskDetailView } from "@/components/tasks/TaskDetailView";
+import { MarkAsRead } from "@/components/tracking/MarkAsRead";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
@@ -76,14 +77,33 @@ export default async function TacheDetailPage({ params }: PageProps) {
     if (pData) priority = pData as Priority;
   }
 
+  // Accusé de lecture du responsable pour le planificateur
+  let assigneeReadAt: string | null = null;
+  if (taskData.assignee_id) {
+    const { data: readData } = await supabase
+      .from("reads")
+      .select("first_read_at")
+      .eq("entity_type", "task")
+      .eq("entity_id", params.id)
+      .eq("user_id", taskData.assignee_id)
+      .maybeSingle();
+    if (readData) assigneeReadAt = readData.first_read_at;
+  }
+
   return (
     <AppShell profile={profile}>
+      <MarkAsRead
+        entityType="task"
+        entityId={taskData.id}
+        userId={profile.id}
+      />
       <TaskDetailView
         profile={profile}
         initialTask={taskData as Task}
         assignee={assignee}
         decision={decision}
         priority={priority}
+        assigneeReadAt={assigneeReadAt}
       />
     </AppShell>
   );

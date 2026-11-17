@@ -130,3 +130,67 @@ export interface Task {
 }
 
 export type task_status_type = "todo" | "doing" | "done";
+
+export interface ReadReceipt {
+  user_id: string;
+  entity_type: "task" | "decision" | "meeting";
+  entity_id: string;
+  first_read_at: string;
+  user?: Profile;
+}
+
+export interface AppNotification {
+  id: string;
+  user_id: string;
+  kind: string;
+  title: string;
+  body: string | null;
+  link: string | null;
+  created_at: string;
+  read_at: string | null;
+}
+
+export interface PointsLog {
+  id: string;
+  user_id: string;
+  delta: number;
+  reason: string;
+  ref_id: string | null;
+  created_at: string;
+}
+
+export type BadgeKey =
+  | "first_task"
+  | "five_on_time"
+  | "series_ten"
+  | "assiduous_reader"
+  | "club_voice"
+  | "always_there";
+
+export interface UserBadge {
+  user_id: string;
+  badge_key: BadgeKey;
+  earned_at: string;
+}
+
+export interface IndicatorMetric {
+  key: string;
+  label: string;
+  current_value: number;
+  previous_value: number;
+  unit: string;
+  trend: "up" | "down" | "flat";
+  history: { month: string; value: number }[];
+  target: number;
+  explanation: string;
+}
+
+export interface ClubMetricsResponse {
+  period: "month" | "quarter" | "year";
+  the_one_thing: IndicatorMetric;
+  tasks_on_time: IndicatorMetric;
+  decisions_validated: IndicatorMetric;
+  meetings_45_min: IndicatorMetric;
+  attendance_rate: IndicatorMetric;
+}
+

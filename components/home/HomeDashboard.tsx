@@ -15,6 +15,13 @@ import {
   Sparkles,
   ChevronRight,
   ShieldAlert,
+  Bell,
+  X,
+  TrendingUp,
+  BarChart3,
+  Eye,
+  ArrowRight,
+  AlertTriangle,
 } from "lucide-react";
 import { PatternBand } from "@/components/ui/PatternBand";
 import { Card } from "@/components/ui/Card";
@@ -42,6 +49,12 @@ interface HomeDashboardProps {
   initialDecisionsToValidate: Decision[];
   initialMyTasks: Task[];
   unvalidatedDecisionsCount: number;
+  miniMetrics?: any;
+  plannerWatchlist?: {
+    unseenCount: number;
+    overdueCount: number;
+    draftDecisionsCount: number;
+  };
 }
 
 export const HomeDashboard: React.FC<HomeDashboardProps> = ({
@@ -53,6 +66,8 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   initialDecisionsToValidate,
   initialMyTasks,
   unvalidatedDecisionsCount,
+  miniMetrics,
+  plannerWatchlist,
 }) => {
   const { showToast } = useToast();
   const isPlanner = profile.role === "planner";
@@ -79,9 +94,32 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
   // Montage côté client pour les dates et comptes à rebours
   const [mounted, setMounted] = useState(false);
+  const [showPushBanner, setShowPushBanner] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+    if (typeof window !== "undefined") {
+      const dismissedUntil = localStorage.getItem("club_cj_push_banner_dismissed");
+      if (dismissedUntil && Number(dismissedUntil) > Date.now()) {
+        setShowPushBanner(false);
+      } else if (!("Notification" in window) || Notification.permission === "granted") {
+        setShowPushBanner(false);
+      } else {
+        setShowPushBanner(true);
+      }
+    }
   }, []);
+
+  const handleDismissBanner = () => {
+    setShowPushBanner(false);
+    if (typeof window !== "undefined") {
+      // Masquer pendant 7 jours
+      localStorage.setItem(
+        "club_cj_push_banner_dismissed",
+        String(Date.now() + 7 * 24 * 3600 * 1000)
+      );
+    }
+  };
 
   const daysRemainingInMonth = mounted ? getDaysRemainingInMonth() : 0;
 
@@ -264,8 +302,51 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
 
   const firstName = profile.full_name ? profile.full_name.split(" ")[0] : "Membre";
 
+  const todayStr = mounted ? new Date().toISOString().split("T")[0] : "";
+  const urgentTasks = initialMyTasks.filter((t) => t.due_date <= todayStr);
+  const pendingRsvp = nextMeeting && nextMeeting.user_rsvp === null;
+  const hasImmediateActions =
+    decisionsToValidate.length > 0 || urgentTasks.length > 0 || pendingRsvp;
+
   return (
     <div className="space-y-8 animate-fade-in-up">
+      {/* Bannière d'activation push (7 jours fermable) */}
+      {showPushBanner && (
+        <div className="p-4 rounded-md bg-[#232D6B] text-white flex items-center justify-between gap-4 shadow-2 animate-fade-in-up">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-full bg-white/10 text-white shrink-0">
+              <Bell className="w-5 h-5 text-accent" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">
+                Active les notifications pour ne rien rater
+              </p>
+              <p className="text-xs text-white/80">
+                Reçois les convocations de réunions et les rappels d’échéances.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/parametres">
+              <Button
+                variant="primary"
+                className="text-xs py-1.5 px-3 min-h-[36px] bg-accent text-[#232D6B] hover:bg-[#c99514] font-bold"
+              >
+                Activer
+              </Button>
+            </Link>
+            <button
+              type="button"
+              onClick={handleDismissBanner}
+              className="p-1.5 rounded-full text-white/70 hover:text-white hover:bg-white/10 touch-target-min flex items-center justify-center"
+              aria-label="Fermer la bannière"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 1. Bandeau de bienvenue */}
       <section className="bg-white rounded-md border border-border shadow-1 overflow-hidden">
         <PatternBand height={36} opacity={0.12} />
@@ -281,6 +362,78 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
           </p>
         </div>
       </section>
+
+      {/* Bloc « À faire maintenant » */}
+      {hasImmediateActions && (
+        <Card className="p-5 border-l-4 border-l-alert space-y-4 shadow-1">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-full bg-alert/15 text-alert">
+                <AlertTriangle className="w-4 h-4" />
+              </div>
+              <h2 className="font-display font-bold text-base text-primary">
+                À faire maintenant
+              </h2>
+            </div>
+            <span className="text-xs font-semibold text-alert">
+              Actions prioritaires
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {decisionsToValidate.length > 0 && (
+              <Link href="/decisions" className="block">
+                <div className="p-3.5 rounded-md bg-surface-muted hover:bg-white border border-border space-y-1 transition-all">
+                  <div className="flex items-center justify-between text-xs font-semibold text-text">
+                    <span className="flex items-center gap-1.5 text-alert">
+                      <CheckSquare className="w-4 h-4" />
+                      Décisions
+                    </span>
+                    <Badge variant="alert">{decisionsToValidate.length}</Badge>
+                  </div>
+                  <p className="text-xs text-text-muted line-clamp-1">
+                    {decisionsToValidate[0].text}
+                  </p>
+                </div>
+              </Link>
+            )}
+
+            {urgentTasks.length > 0 && (
+              <Link href={`/taches/${urgentTasks[0].id}`} className="block">
+                <div className="p-3.5 rounded-md bg-surface-muted hover:bg-white border border-border space-y-1 transition-all">
+                  <div className="flex items-center justify-between text-xs font-semibold text-text">
+                    <span className="flex items-center gap-1.5 text-alert">
+                      <Clock className="w-4 h-4" />
+                      Tâches urgentes
+                    </span>
+                    <Badge variant="alert">{urgentTasks.length}</Badge>
+                  </div>
+                  <p className="text-xs text-text-muted line-clamp-1">
+                    {urgentTasks[0].title}
+                  </p>
+                </div>
+              </Link>
+            )}
+
+            {pendingRsvp && nextMeeting && (
+              <Link href={`/reunions/${nextMeeting.id}`} className="block">
+                <div className="p-3.5 rounded-md bg-surface-muted hover:bg-white border border-border space-y-1 transition-all">
+                  <div className="flex items-center justify-between text-xs font-semibold text-text">
+                    <span className="flex items-center gap-1.5 text-primary">
+                      <Calendar className="w-4 h-4" />
+                      Présence requise
+                    </span>
+                    <Badge variant="neutral">RSVP</Badge>
+                  </div>
+                  <p className="text-xs text-text-muted line-clamp-1">
+                    {nextMeeting.title}
+                  </p>
+                </div>
+              </Link>
+            )}
+          </div>
+        </Card>
+      )}
 
       {/* 2. Bandeau « La Seule Chose du mois » */}
       <section aria-label="Priorité du mois">
@@ -403,27 +556,128 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
         </Card>
       </section>
 
-      {/* 3. Section supplémentaire Planificateurs : Décisions en attente */}
-      {isPlanner && unvalidatedDecisionsCount > 0 && (
-        <section aria-label="Alerte planificateur">
-          <Link href="/decisions?tab=unvalidated" className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-md">
-            <Card className="p-4 sm:p-5 bg-[#F7E7C4]/40 border-accent/40 flex items-center justify-between gap-3 hover:bg-[#F7E7C4]/60">
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-full bg-accent/30 text-[#232D6B]">
-                  <ShieldAlert className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-sm sm:text-base text-[#232D6B]">
-                    {copy.home.plannerPendingDecisions.title}
-                  </h3>
-                  <p className="text-xs text-text-muted">
-                    {copy.home.plannerPendingDecisions.countText(unvalidatedDecisionsCount)}
-                  </p>
-                </div>
+      {/* 3. Section supplémentaire Planificateurs : À surveiller */}
+      {isPlanner && (
+        <section aria-label="À surveiller">
+          <Card className="p-5 border-l-4 border-l-primary space-y-4 shadow-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <ShieldAlert className="w-5 h-5 text-primary" />
+                <h2 className="font-display font-bold text-base text-primary">
+                  À surveiller (Planificateurs)
+                </h2>
               </div>
-              <ChevronRight className="w-5 h-5 text-primary shrink-0" />
-            </Card>
-          </Link>
+              <Link
+                href="/suivi"
+                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+              >
+                <span>Accéder au suivi et relances</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <Link href="/suivi" className="block">
+                <div className="p-3 rounded-md bg-surface-muted hover:bg-white border border-border text-center space-y-1 transition-all">
+                  <span className="text-2xl font-bold font-display text-alert block">
+                    {plannerWatchlist?.unseenCount || 0}
+                  </span>
+                  <span className="text-xs font-medium text-text-muted">
+                    Non vues (+24 h)
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/suivi" className="block">
+                <div className="p-3 rounded-md bg-surface-muted hover:bg-white border border-border text-center space-y-1 transition-all">
+                  <span className="text-2xl font-bold font-display text-alert block">
+                    {plannerWatchlist?.overdueCount || 0}
+                  </span>
+                  <span className="text-xs font-medium text-text-muted">
+                    Tâches en retard
+                  </span>
+                </div>
+              </Link>
+
+              <Link href="/reunions" className="block">
+                <div className="p-3 rounded-md bg-surface-muted hover:bg-white border border-border text-center space-y-1 transition-all">
+                  <span className="text-2xl font-bold font-display text-primary block">
+                    {plannerWatchlist?.draftDecisionsCount || 0}
+                  </span>
+                  <span className="text-xs font-medium text-text-muted">
+                    Décisions brouillon
+                  </span>
+                </div>
+              </Link>
+            </div>
+          </Card>
+        </section>
+      )}
+
+      {/* Mini synthèse des indicateurs */}
+      {miniMetrics && (
+        <section aria-label="Mini synthèse des indicateurs">
+          <Card className="p-5 space-y-4 shadow-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-primary" />
+                <h2 className="font-display font-bold text-base text-primary">
+                  Santé du club (ce mois-ci)
+                </h2>
+              </div>
+              <Link
+                href="/indicateurs"
+                className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+              >
+                <span>Voir les 5 indicateurs</span>
+                <ChevronRight className="w-4 h-4" />
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3.5 rounded-md bg-surface-muted border border-border space-y-1">
+                <span className="text-xs text-text-muted block font-medium">
+                  La Seule Chose
+                </span>
+                <div className="flex items-baseline gap-1 font-display font-bold text-2xl text-primary">
+                  <span>
+                    {miniMetrics.priority?.has_data
+                      ? `${miniMetrics.priority.percent}%`
+                      : "—"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-text-muted">Objectif 100%</span>
+              </div>
+
+              <div className="p-3.5 rounded-md bg-surface-muted border border-border space-y-1">
+                <span className="text-xs text-text-muted block font-medium">
+                  Tâches dans les délais
+                </span>
+                <div className="flex items-baseline gap-1 font-display font-bold text-2xl text-primary">
+                  <span>
+                    {miniMetrics.ontime_tasks?.has_data
+                      ? `${miniMetrics.ontime_tasks.rate}%`
+                      : "—"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-text-muted">Objectif 85%</span>
+              </div>
+
+              <div className="p-3.5 rounded-md bg-surface-muted border border-border space-y-1">
+                <span className="text-xs text-text-muted block font-medium">
+                  Réunions de 45 min
+                </span>
+                <div className="flex items-baseline gap-1 font-display font-bold text-2xl text-primary">
+                  <span>
+                    {miniMetrics.meeting_time?.has_data
+                      ? `${miniMetrics.meeting_time.rate}%`
+                      : "—"}
+                  </span>
+                </div>
+                <span className="text-[11px] text-text-muted">Objectif 100%</span>
+              </div>
+            </div>
+          </Card>
         </section>
       )}
 

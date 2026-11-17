@@ -125,14 +125,11 @@ export function formatValidationRemaining(deadlineInput: string | Date | null): 
 
 /**
  * Calcule le nombre de jours restants dans le mois courant en fuseau Africa/Ouagadougou.
- * Exemple de retour : 13
  */
 export function getDaysRemainingInMonth(): number {
   const now = new Date();
-  // Année et mois actuels
   const year = now.getFullYear();
   const month = now.getMonth();
-  // Dernier jour du mois courant
   const lastDay = new Date(year, month + 1, 0).getDate();
   const currentDay = now.getDate();
 
@@ -141,15 +138,10 @@ export function getDaysRemainingInMonth(): number {
 
 /**
  * Évalue l'urgence d'une échéance de tâche.
- * - 'overdue' : en retard (date passée)
- * - 'urgent' : 2 jours ou moins
- * - 'normal' : plus de 2 jours
  */
 export function getDueDateUrgency(dueDateStr: string): "overdue" | "urgent" | "normal" {
   if (!dueDateStr) return "normal";
-  // due_date est au format YYYY-MM-DD
   const now = new Date();
-  // Fin du jour d'échéance à Ouagadougou
   const dueDateEnd = new Date(`${dueDateStr}T23:59:59Z`);
 
   const diffMs = dueDateEnd.getTime() - now.getTime();
@@ -179,4 +171,32 @@ export function getDaysOverdue(dueDateStr: string): string {
 
   const days = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
   return `En retard de ${days} jour${days > 1 ? "s" : ""}`;
+}
+
+/**
+ * Temps relatif pour les notifications (ex : « il y a 2 h » ou « à l’instant »).
+ */
+export function formatRelativeTime(dateInput: string | Date | number): string {
+  const date = typeof dateInput === "string" || typeof dateInput === "number" ? new Date(dateInput) : dateInput;
+  if (isNaN(date.getTime())) return "";
+
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+
+  if (diffMs < 60000) {
+    return "à l’instant";
+  }
+
+  const minutes = Math.floor(diffMs / 60000);
+  if (minutes < 60) {
+    return `il y a ${minutes} min`;
+  }
+
+  const hours = Math.floor(diffMs / 3600000);
+  if (hours < 24) {
+    return `il y a ${hours} h`;
+  }
+
+  const days = Math.floor(diffMs / 86400000);
+  return `il y a ${days} j`;
 }

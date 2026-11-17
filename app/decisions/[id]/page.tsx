@@ -2,10 +2,11 @@ import { requireAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/AppShell";
 import { DecisionDetailView } from "@/components/decisions/DecisionDetailView";
+import { MarkAsRead } from "@/components/tracking/MarkAsRead";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import Link from "next/link";
-import type { Decision, Meeting, Task, DecisionValidation, Profile } from "@/types/database";
+import type { Decision, Meeting, Task, DecisionValidation, Profile, ReadReceipt } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
@@ -72,8 +73,20 @@ export default async function DecisionDetailPage({ params }: PageProps) {
     .select("*")
     .order("full_name", { ascending: true });
 
+  // Récupérer les accusés de lecture
+  const { data: readsData } = await supabase
+    .from("reads")
+    .select("*")
+    .eq("entity_type", "decision")
+    .eq("entity_id", params.id);
+
   return (
     <AppShell profile={profile}>
+      <MarkAsRead
+        entityType="decision"
+        entityId={decisionData.id}
+        userId={profile.id}
+      />
       <DecisionDetailView
         profile={profile}
         initialDecision={decisionData as Decision}
@@ -81,6 +94,7 @@ export default async function DecisionDetailPage({ params }: PageProps) {
         tasks={(tasksData as Task[]) || []}
         validations={(validationsData as DecisionValidation[]) || []}
         allProfiles={(profilesData as Profile[]) || []}
+        readReceipts={(readsData as ReadReceipt[]) || []}
       />
     </AppShell>
   );
