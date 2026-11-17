@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Clock, Calendar, MapPin, ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -28,6 +28,47 @@ export const MeetingForm: React.FC<MeetingFormProps> = ({ profile }) => {
   const [location, setLocation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Restauration du brouillon local
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = localStorage.getItem("club_cj_meeting_draft");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.title) setTitle(parsed.title);
+        if (parsed.description) setDescription(parsed.description);
+        if (parsed.dateTime) setDateTime(parsed.dateTime);
+        if (parsed.duration) setDuration(parsed.duration);
+        if (parsed.location) setLocation(parsed.location);
+      }
+    } catch {
+      // Ignorer les erreurs de lecture du stockage local
+    }
+  }, []);
+
+  // Sauvegarde automatique du brouillon
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (title || description || location) {
+      localStorage.setItem(
+        "club_cj_meeting_draft",
+        JSON.stringify({ title, description, dateTime, duration, location })
+      );
+    }
+  }, [title, description, dateTime, duration, location]);
+
+  // Avertissement de perte de saisie si l'utilisateur quitte la page
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (title.trim()) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [title]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,6 +132,9 @@ export const MeetingForm: React.FC<MeetingFormProps> = ({ profile }) => {
       }).catch((err) => console.warn("Erreur broadcast notification :", err));
 
       showToast("Réunion planifiée avec succès.", "success");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("club_cj_meeting_draft");
+      }
       router.push(`/reunions/${data.id}?created=true`);
     } catch {
       setErrorMessage(copy.app.errorGeneric);

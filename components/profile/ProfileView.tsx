@@ -21,6 +21,7 @@ import {
   CheckCircle2,
   Lock,
   Clock,
+  MessageSquare,
 } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
@@ -422,26 +423,52 @@ export const ProfileView: React.FC<ProfileViewProps> = ({
                   Aucun planificateur enregistré pour le moment.
                 </p>
               ) : (
-                planners.map((p) => (
-                  <div
-                    key={p.id}
-                    className="p-3 rounded-md bg-surface-muted border border-border flex items-center justify-between text-xs"
-                  >
-                    <div className="space-y-0.5">
-                      <span className="font-semibold text-text block">
-                        {p.full_name || "Planificateur"}
-                      </span>
-                      <span className="text-text-muted">{p.email}</span>
-                    </div>
-                    <a
-                      href={`mailto:${p.email}`}
-                      className="p-2 rounded-full hover:bg-white text-primary transition-colors"
-                      title="Envoyer un e-mail"
+                planners.map((p) => {
+                  const firstName = p.full_name?.split(" ")[0] || "Planificateur";
+                  const waText = `Salut ${firstName}, j’ai une question concernant Le Fil du bureau CJ : `;
+                  const waUrl = p.phone
+                    ? `https://wa.me/${p.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waText)}`
+                    : `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="p-3.5 rounded-md bg-surface-muted border border-border flex items-center justify-between gap-3 text-xs"
                     >
-                      <Mail className="w-4 h-4" />
-                    </a>
-                  </div>
-                ))
+                      <div className="space-y-0.5 min-w-0">
+                        <span className="font-semibold text-text block truncate">
+                          {p.full_name || "Planificateur"}
+                        </span>
+                        <span className="text-[11px] text-text-muted truncate block">
+                          {p.email}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <a
+                          href={waUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex"
+                        >
+                          <Button
+                            variant="primary"
+                            className="text-xs min-h-[34px] py-1 px-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white border-none font-semibold"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 mr-1" />
+                            <span>WhatsApp</span>
+                          </Button>
+                        </a>
+                        <a
+                          href={`mailto:${p.email}`}
+                          className="p-2 rounded-full hover:bg-white text-primary transition-colors touch-target-min flex items-center justify-center"
+                          title="Envoyer un e-mail"
+                        >
+                          <Mail className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
 

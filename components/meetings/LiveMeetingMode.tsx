@@ -684,8 +684,20 @@ export const LiveMeetingMode: React.FC<LiveMeetingModeProps> = ({
             </span>
 
             {/* Grands chiffres Sora 800 */}
-            <div className="font-display font-extrabold text-5xl sm:text-7xl text-primary tabular-nums tracking-tight">
+            <div
+              className="font-display font-extrabold text-5xl sm:text-7xl text-primary tabular-nums tracking-tight"
+              aria-hidden="true"
+            >
               {String(remMinutes).padStart(2, "0")}:{String(remSeconds).padStart(2, "0")}
+            </div>
+
+            {/* Annonce vocale d’accessibilité toutes les 5 minutes uniquement */}
+            <div className="sr-only" aria-live="polite" aria-atomic="true">
+              {remSeconds === 0 && remMinutes > 0 && remMinutes % 5 === 0
+                ? `Il reste ${remMinutes} minutes de réunion.`
+                : isTimeOver
+                ? "Le temps prévu pour la réunion est écoulé."
+                : ""}
             </div>
 
             {/* Barre de progression arrondie du temps */}

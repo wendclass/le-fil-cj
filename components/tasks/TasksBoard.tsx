@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -68,6 +68,34 @@ export const TasksBoard: React.FC<TasksBoardProps> = ({
   const [isPriorityChecked, setIsPriorityChecked] = useState<boolean>(Boolean(activePriority));
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+
+  // Restauration du brouillon local de tâche
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = localStorage.getItem("club_cj_task_draft");
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.taskTitle) setTaskTitle(parsed.taskTitle);
+        if (parsed.taskDesc) setTaskDesc(parsed.taskDesc);
+        if (parsed.selectedDueDate) setSelectedDueDate(parsed.selectedDueDate);
+        if (parsed.selectedAssignee) setSelectedAssignee(parsed.selectedAssignee);
+      }
+    } catch {
+      // Ignorer les erreurs locales
+    }
+  }, []);
+
+  // Sauvegarde automatique du brouillon de tâche
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (taskTitle || taskDesc) {
+      localStorage.setItem(
+        "club_cj_task_draft",
+        JSON.stringify({ taskTitle, taskDesc, selectedDueDate, selectedAssignee })
+      );
+    }
+  }, [taskTitle, taskDesc, selectedDueDate, selectedAssignee]);
 
   // Drag and drop state
   const [draggedTaskId, setDraggedTaskId] = useState<string | null>(null);
@@ -221,6 +249,9 @@ export const TasksBoard: React.FC<TasksBoardProps> = ({
       setTaskDesc("");
       setSelectedDueDate("");
       setSelectedDecisionId("");
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("club_cj_task_draft");
+      }
       setIsCreating(false);
       showToast("Tâche créée avec succès.", "success");
     } catch {

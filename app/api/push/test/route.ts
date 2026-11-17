@@ -13,6 +13,22 @@ export async function POST() {
   }
 
   try {
+    // Vérification du débit : maximum 5 notifications de test par heure par utilisateur
+    const oneHourAgo = new Date(Date.now() - 3600 * 1000).toISOString();
+    const { count } = await supabase
+      .from("notifications")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("kind", "test")
+      .gte("created_at", oneHourAgo);
+
+    if (count !== null && count >= 5) {
+      return NextResponse.json(
+        { error: "Limite atteinte : 5 notifications de test par heure au maximum." },
+        { status: 429 }
+      );
+    }
+
     await sendNotificationToUser(user.id, {
       kind: "test",
       title: "Notification de test",

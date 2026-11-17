@@ -2,7 +2,7 @@ import { requireAuth } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import { AppShell } from "@/components/layout/AppShell";
 import { HomeDashboard } from "@/components/home/HomeDashboard";
-import type { Priority, Meeting, Decision, Task, RsvpStatus } from "@/types/database";
+import type { Profile, Priority, Meeting, Decision, Task, RsvpStatus } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
@@ -174,6 +174,13 @@ export default async function HomePage() {
     };
   }
 
+  // 9. Liste des planificateurs pour le support WhatsApp (« Un souci ? »)
+  const { data: plannersData } = await supabase
+    .from("profiles")
+    .select("*")
+    .eq("role", "planner");
+  const planners = (plannersData as Profile[]) || [];
+
   return (
     <AppShell profile={profile}>
       <HomeDashboard
@@ -187,6 +194,7 @@ export default async function HomePage() {
         unvalidatedDecisionsCount={unvalidatedDecisionsCount}
         miniMetrics={metricsData}
         plannerWatchlist={plannerWatchlist}
+        planners={planners}
       />
     </AppShell>
   );

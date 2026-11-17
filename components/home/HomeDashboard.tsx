@@ -22,6 +22,9 @@ import {
   Eye,
   ArrowRight,
   AlertTriangle,
+  HelpCircle,
+  MessageSquare,
+  Mail,
 } from "lucide-react";
 import { PatternBand } from "@/components/ui/PatternBand";
 import { Card } from "@/components/ui/Card";
@@ -55,6 +58,7 @@ interface HomeDashboardProps {
     overdueCount: number;
     draftDecisionsCount: number;
   };
+  planners?: Profile[];
 }
 
 export const HomeDashboard: React.FC<HomeDashboardProps> = ({
@@ -68,9 +72,11 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
   unvalidatedDecisionsCount,
   miniMetrics,
   plannerWatchlist,
+  planners = [],
 }) => {
   const { showToast } = useToast();
   const isPlanner = profile.role === "planner";
+  const [showSupportModal, setShowSupportModal] = useState(false);
 
   // États locaux
   const [activePriority, setActivePriority] = useState<Priority | null>(initialActivePriority);
@@ -995,6 +1001,134 @@ export const HomeDashboard: React.FC<HomeDashboardProps> = ({
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* 5. Pied de page discret d’assistance et mentions légales */}
+      <footer className="pt-6 border-t border-border/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-text-muted">
+        <div className="flex items-center gap-4 flex-wrap justify-center sm:justify-start">
+          <button
+            type="button"
+            onClick={() => setShowSupportModal(true)}
+            className="hover:text-primary font-medium transition-colors flex items-center gap-1.5"
+          >
+            <HelpCircle className="w-3.5 h-3.5 text-accent" />
+            <span>Un souci ? Écris à un planificateur</span>
+          </button>
+          <span>•</span>
+          <Link href="/a-propos" className="hover:text-primary transition-colors">
+            À propos et confidentialité
+          </Link>
+          <span>•</span>
+          <Link href="/installer" className="hover:text-primary transition-colors">
+            Installer l’application
+          </Link>
+        </div>
+
+        <span className="text-[11px] text-text-muted">
+          Club CJ • IPERMIC Ouagadougou
+        </span>
+      </footer>
+
+      {/* Modale d’aide & contact direct des planificateurs sur WhatsApp */}
+      {showSupportModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-primary/40 backdrop-blur-sm animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setShowSupportModal(false)}
+        >
+          <Card
+            className="w-full max-w-md p-6 space-y-5 animate-scale-up shadow-3"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between border-b border-border pb-3">
+              <div className="flex items-center gap-2">
+                <HelpCircle className="w-5 h-5 text-accent" />
+                <h3 className="font-display font-bold text-lg text-primary">
+                  {copy.profile.supportModalTitle}
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowSupportModal(false)}
+                className="p-1 rounded-full text-text-muted hover:text-text hover:bg-surface-muted touch-target-min flex items-center justify-center"
+                aria-label="Fermer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-xs sm:text-sm text-text-muted leading-relaxed">
+              Une question sur une tâche, une décision ou un blocage ? Contacte directement les chargés de planification sur WhatsApp ou par e-mail :
+            </p>
+
+            <div className="space-y-3">
+              {planners.length === 0 ? (
+                <p className="text-xs text-text-muted italic py-2">
+                  Aucun planificateur enregistré pour le moment.
+                </p>
+              ) : (
+                planners.map((p) => {
+                  const firstName = p.full_name?.split(" ")[0] || "Planificateur";
+                  const waText = `Salut ${firstName}, j’ai une question concernant Le Fil du bureau CJ : `;
+                  const waUrl = p.phone
+                    ? `https://wa.me/${p.phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(waText)}`
+                    : `https://wa.me/?text=${encodeURIComponent(waText)}`;
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="p-3.5 rounded-md bg-surface-muted border border-border flex items-center justify-between gap-3 text-xs"
+                    >
+                      <div className="space-y-0.5 min-w-0">
+                        <span className="font-semibold text-text block truncate">
+                          {p.full_name || "Planificateur"}
+                        </span>
+                        <span className="text-[11px] text-text-muted truncate block">
+                          {p.email}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <a
+                          href={waUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex"
+                        >
+                          <Button
+                            variant="primary"
+                            className="text-xs min-h-[34px] py-1 px-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white border-none font-semibold"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 mr-1" />
+                            <span>WhatsApp</span>
+                          </Button>
+                        </a>
+                        <a
+                          href={`mailto:${p.email}`}
+                          className="p-2 rounded-full hover:bg-white text-primary transition-colors touch-target-min flex items-center justify-center"
+                          title="Envoyer un e-mail"
+                        >
+                          <Mail className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            <div className="pt-2 text-right border-t border-border">
+              <Button
+                variant="secondary"
+                onClick={() => setShowSupportModal(false)}
+                className="text-xs"
+              >
+                Fermer
+              </Button>
+            </div>
+          </Card>
         </div>
       )}
     </div>

@@ -12,6 +12,7 @@ export interface Profile {
   full_name: string | null;
   avatar_url: string | null;
   role: UserRole;
+  phone?: string | null;
   points: number;
   streak: number;
   best_streak: number;

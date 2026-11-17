@@ -1,7 +1,23 @@
 // Service Worker PWA & Web Push - Le Fil du bureau CJ
-const CACHE_NAME = "le-fil-cj-v2";
+const CACHE_NAME = "le-fil-cj-v3";
+const OFFLINE_FALLBACK = "/hors-ligne";
+
+const PRECACHE_ASSETS = [
+  "/",
+  "/hors-ligne",
+  "/installer",
+  "/manifest.webmanifest",
+  "/brand/club-cj-logo.png",
+];
 
 self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(PRECACHE_ASSETS).catch((err) => {
+        console.warn("Pré-mise en cache partielle du shell PWA :", err);
+      });
+    })
+  );
   self.skipWaiting();
 });
 
@@ -59,8 +75,47 @@ self.addEventListener("notificationclick", (event) => {
   );
 });
 
+// Gestionnaire réseau et hors-ligne
 self.addEventListener("fetch", (event) => {
-  if (event.request.method !== "GET" || event.request.url.startsWith("chrome-extension")) {
+  const request = event.request;
+
+  if (request.method !== "GET" || request.url.startsWith("chrome-extension")) {
     return;
+  }
+
+  // Requêtes de navigation (pages HTML)
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request).catch(async () => {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(request);
+        if (cachedResponse) return cachedResponse;
+        return cache.match(OFFLINE_FALLBACK);
+      })
+    );
+    return;
+  }
+
+  // Fichiers statiques : Next.js static, images, polices
+  if (
+    request.url.includes("/_next/static/") ||
+    request.url.includes("/brand/") ||
+    request.destination === "font" ||
+    request.destination === "style"
+  ) {
+    event.respondWith(
+      caches.match(request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+        return fetch(request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const responseClone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(request, responseClone);
+            });
+          }
+          return networkResponse;
+        });
+      })
+    );
   }
 });

@@ -2,6 +2,8 @@ import React from "react";
 import { AppHeader } from "./AppHeader";
 import { DesktopSidebar } from "./DesktopSidebar";
 import { MobileTabBar } from "./MobileTabBar";
+import { OfflineBanner } from "./OfflineBanner";
+import { PwaInstallPrompt } from "./PwaInstallPrompt";
 import type { Profile } from "@/types/database";
 
 interface AppShellProps {
@@ -12,6 +14,7 @@ interface AppShellProps {
 export const AppShell: React.FC<AppShellProps> = ({ children, profile }) => {
   return (
     <div className="min-h-screen flex flex-col bg-bg text-text">
+      <OfflineBanner />
       <AppHeader profile={profile} />
 
       <div className="flex-1 flex w-full">
@@ -25,6 +28,7 @@ export const AppShell: React.FC<AppShellProps> = ({ children, profile }) => {
       </div>
 
       <MobileTabBar profile={profile} />
+      <PwaInstallPrompt />
     </div>
   );
 };
